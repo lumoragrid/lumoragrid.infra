@@ -1,12 +1,12 @@
 resource "azurerm_mssql_server" "server" {
-  name                         = var.server_name
-  resource_group_name          = var.rg_name
-  location                     = var.location
-  version                      = var.sql_version
-  administrator_login          = var.administrator_login
-  administrator_login_password = var.administrator_login_password
+  name                          = var.server_name
+  resource_group_name           = var.rg_name
+  location                      = var.location
+  version                       = var.sql_version
+  administrator_login           = var.administrator_login
+  administrator_login_password  = var.administrator_login_password
   public_network_access_enabled = var.public_network_access_enabled
-  tags                         = var.tags
+  tags                          = var.tags
 }
 
 resource "azurerm_mssql_database" "db" {
@@ -24,10 +24,10 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
   target_resource_id         = azurerm_mssql_server.server.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { 
-    category = "AllMetrics" 
-    enabled = true 
-    }
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
 }
 
 resource "azurerm_private_endpoint" "pe" {

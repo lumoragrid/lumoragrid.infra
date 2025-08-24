@@ -1,9 +1,9 @@
-﻿# Namespace
+# Namespace
 resource "azurerm_servicebus_namespace" "ns" {
   name                          = var.name
   location                      = var.location
   resource_group_name           = var.rg_name
-  sku                           = var.sb_tier                     # "Standard" or "Premium"
+  sku                           = var.sb_tier # "Standard" or "Premium"
   capacity                      = var.sb_tier == "Premium" ? var.capacity : null
   public_network_access_enabled = var.public_network_access_enabled
   minimum_tls_version           = "1.2"

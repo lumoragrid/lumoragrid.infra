@@ -1,4 +1,4 @@
-﻿# modules/cosmos/main.tf
+# modules/cosmos/main.tf
 
 resource "azurerm_cosmosdb_account" "acct" {
   name                = var.name

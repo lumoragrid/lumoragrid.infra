@@ -1,13 +1,13 @@
 resource "azurerm_storage_account" "sa" {
-  name                              = var.account_name
-  resource_group_name               = var.rg_name
-  location                          = var.location
-  account_tier                      = "Standard"
-  account_replication_type          = "LRS"
-  min_tls_version                   = "TLS1_2"
-  allow_nested_items_to_be_public   = false
-  public_network_access_enabled     = var.public_network_access_enabled
-  tags                              = var.tags
+  name                            = var.account_name
+  resource_group_name             = var.rg_name
+  location                        = var.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false
+  public_network_access_enabled   = var.public_network_access_enabled
+  tags                            = var.tags
 
   blob_properties {
     versioning_enabled = var.enable_versioning

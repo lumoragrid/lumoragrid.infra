@@ -1,14 +1,14 @@
 resource "azurerm_key_vault" "kv" {
-  name                        = var.name
-  location                    = var.location
-  resource_group_name         = var.rg_name
-  tenant_id                   = var.tenant_id
-  sku_name                    = "standard"
-  soft_delete_retention_days  = 7
-  purge_protection_enabled    = var.enable_purge_protection
-  enable_rbac_authorization   = true
+  name                          = var.name
+  location                      = var.location
+  resource_group_name           = var.rg_name
+  tenant_id                     = var.tenant_id
+  sku_name                      = "standard"
+  soft_delete_retention_days    = 7
+  purge_protection_enabled      = var.enable_purge_protection
+  enable_rbac_authorization     = true
   public_network_access_enabled = var.public_network_access_enabled
-  tags                        = var.tags
+  tags                          = var.tags
 }
 
 resource "azurerm_monitor_diagnostic_setting" "diag" {
@@ -17,10 +17,10 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
   target_resource_id         = azurerm_key_vault.kv.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { 
-    category = "AllMetrics" 
-    enabled = true 
-    }
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
 }
 
 # Private Endpoint (vault)
