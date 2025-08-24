@@ -1,36 +1,48 @@
+﻿# modules/cosmos/main.tf
+
 resource "azurerm_cosmosdb_account" "acct" {
   name                = var.name
   location            = var.location
   resource_group_name = var.rg_name
-  offer_type          = "Standard"
   kind                = "GlobalDocumentDB"
-  enable_automatic_failover = false
-  enable_free_tier          = var.enable_free_tier
+
+  # ✅ correct argument names (old: enable_automatic_failover / enable_free_tier)
+  automatic_failover_enabled    = var.automatic_failover_enabled
+  free_tier_enabled             = var.enable_free_tier
   public_network_access_enabled = var.public_network_access_enabled
-  tags                = var.tags
+
+  # REQUIRED by provider: at least one geo_location (write region)
+  geo_location {
+    location          = var.location
+    failover_priority = 0
+    zone_redundant    = false
+  }
 
   consistency_policy {
     consistency_level = "Session"
   }
 
+  # Serverless toggle (kept as-is)
   dynamic "capabilities" {
     for_each = var.cosmos_serverless ? [1] : []
     content {
       name = "EnableServerless"
     }
   }
+
+  tags = var.tags
 }
 
+# Diagnostics (new syntax avoids the 'metric' deprecation warning)
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
   name                       = "diag-cosmos"
   target_resource_id         = azurerm_cosmosdb_account.acct.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { 
-    category = "AllMetrics" 
-    enabled = true 
-    }
+  enabled_metric {
+    category = "AllMetrics"
+  }
 }
 
 # Private Endpoint (SQL API)

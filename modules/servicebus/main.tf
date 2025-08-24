@@ -1,28 +1,35 @@
+﻿# Namespace
 resource "azurerm_servicebus_namespace" "ns" {
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.rg_name
-  sku                 = var.sb_tier
-  capacity            = var.sb_tier == "Premium" ? var.capacity : null
+  name                          = var.name
+  location                      = var.location
+  resource_group_name           = var.rg_name
+  sku                           = var.sb_tier                     # "Standard" or "Premium"
+  capacity                      = var.sb_tier == "Premium" ? var.capacity : null
   public_network_access_enabled = var.public_network_access_enabled
-  tags                = var.tags
-
-  dynamic "network_rule_set" {
-    for_each = length(var.ip_rules) > 0 ? [1] : []
-    content {
-      default_action = "Deny"
-
-      dynamic "ip_rule" {
-        for_each = var.ip_rules
-        content {
-          action  = "Allow"
-          ip_mask = ip_rule.value
-        }
-      }
-    }
-  }
+  minimum_tls_version           = "1.2"
+  tags                          = var.tags
 }
 
+# Network rules (separate resource – replaces inline network_rule_set)
+resource "azurerm_servicebus_namespace_network_rule_set" "rules" {
+  resource_group_name = var.rg_name
+  namespace_name      = azurerm_servicebus_namespace.ns.name
+
+  # If any IPs provided → default deny + explicit allows; else allow all
+  default_action = length(var.ip_rules) > 0 ? "Deny" : "Allow"
+
+  dynamic "ip_rule" {
+    for_each = var.ip_rules
+    content {
+      ip_mask = ip_rule.value
+      action  = "Allow"
+    }
+  }
+
+  # Add virtual_network_rule blocks later if you lock to VNets.
+}
+
+# Queues (optional)
 resource "azurerm_servicebus_queue" "q" {
   for_each            = toset(var.queues)
   name                = each.value
@@ -30,24 +37,30 @@ resource "azurerm_servicebus_queue" "q" {
   enable_partitioning = true
 }
 
+# Topics (optional)
 resource "azurerm_servicebus_topic" "t" {
   for_each     = toset(var.topics)
   name         = each.value
   namespace_id = azurerm_servicebus_namespace.ns.id
 }
 
+# Diagnostics
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
   name                       = "diag-sb"
   target_resource_id         = azurerm_servicebus_namespace.ns.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { 
-    category = "AllMetrics" 
-    enabled = true 
-    }
+  enabled_log {
+    category = "OperationalLogs"
+  }
+
+  enabled_metric {
+    category = "AllMetrics"
+  }
 }
 
+# Private Endpoint (namespace)
 resource "azurerm_private_endpoint" "pe" {
   count               = var.enable_private_endpoints && var.pe_subnet_id != null ? 1 : 0
   name                = "${var.name}-pe"
