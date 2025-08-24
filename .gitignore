@@ -11,3 +11,6 @@
 **/.terraform.lock.hcl
 /.vs/lumoragrid.infra/v17/DocumentLayout.json
 /.vs/lumoragrid.infra/v17/.wsuo
+/envs/dev/.terraform/providers/registry.terraform.io/hashicorp/random/3.7.2/windows_amd64
+/envs/dev/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.1/windows_amd64
+/envs/dev/.terraform
