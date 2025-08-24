@@ -10,8 +10,12 @@ resource "azurerm_servicebus_namespace" "ns" {
   public_network_access_enabled = var.public_network_access_enabled
   minimum_tls_version           = "1.2"
   tags                          = var.tags
-}
 
+  network_rule_set {
+    default_action = length(var.ip_rules) > 0 ? "Deny" : "Allow"
+    ip_rules       = var.ip_rules
+  }
+}
 # Network rules (version-agnostic)
 resource "azurerm_servicebus_namespace_network_rule_set" "rules" {
   namespace_id = azurerm_servicebus_namespace.ns.id

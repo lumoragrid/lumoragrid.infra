@@ -4,14 +4,14 @@ resource "azurerm_cosmosdb_account" "acct" {
   name                = var.name
   location            = var.location
   resource_group_name = var.rg_name
-  kind                = "GlobalDocumentDB"
 
-  # ✅ correct argument names (old: enable_automatic_failover / enable_free_tier)
+  offer_type = "Standard"
+  kind       = "GlobalDocumentDB"
+
   automatic_failover_enabled    = var.automatic_failover_enabled
   free_tier_enabled             = var.enable_free_tier
   public_network_access_enabled = var.public_network_access_enabled
 
-  # REQUIRED by provider: at least one geo_location (write region)
   geo_location {
     location          = var.location
     failover_priority = 0
@@ -22,7 +22,6 @@ resource "azurerm_cosmosdb_account" "acct" {
     consistency_level = "Session"
   }
 
-  # Serverless toggle (kept as-is)
   dynamic "capabilities" {
     for_each = var.cosmos_serverless ? [1] : []
     content {
