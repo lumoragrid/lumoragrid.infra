@@ -6,7 +6,9 @@ terraform {
   }
 }
 
-provider "azurerm" { features {} }
+provider "azurerm" { 
+    features {} 
+}
 
 # Uncomment and configure when ready to move to remote state
 #terraform {

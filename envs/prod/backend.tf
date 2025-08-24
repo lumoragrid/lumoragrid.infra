@@ -7,3 +7,7 @@
 #     key                  = "lumoragrid-prod.tfstate"
 #   }
 # }
+
+terraform {
+  backend "azurerm" {}
+}
