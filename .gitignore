@@ -5,3 +5,7 @@
 /.vs/lumoragrid.infra/CopilotIndices/17.13.430.18484
 /.vs/lumoragrid.infra/FileContentIndex
 /.vs/slnx.sqlite
+
+# Terraform lockfiles
+.terraform.lock.hcl
+**/.terraform.lock.hcl
