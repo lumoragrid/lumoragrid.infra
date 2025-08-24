@@ -1,4 +1,4 @@
-﻿# LumoraGrid Terraform – Azure DevOps (bootstrap + dev→test→uat→prod)
+# LumoraGrid Terraform – Azure DevOps (bootstrap + dev→test→uat→prod)
 
 trigger:
   branches: { include: [ main ] }
