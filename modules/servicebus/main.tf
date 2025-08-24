@@ -1,51 +1,33 @@
+# modules/servicebus/main.tf
+
 # Namespace
 resource "azurerm_servicebus_namespace" "ns" {
   name                          = var.name
   location                      = var.location
   resource_group_name           = var.rg_name
-  sku                           = var.sb_tier # "Standard" or "Premium"
+  sku                           = var.sb_tier
   capacity                      = var.sb_tier == "Premium" ? var.capacity : null
   public_network_access_enabled = var.public_network_access_enabled
   minimum_tls_version           = "1.2"
   tags                          = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = contains(["Basic", "Standard", "Premium"], var.sb_tier)
-      error_message = "sb_tier must be one of: Basic, Standard, Premium."
-    }
-    precondition {
-      condition     = var.sb_tier != "Premium" || contains([1, 2, 4], var.capacity)
-      error_message = "When sb_tier is \"Premium\", capacity must be 1, 2, or 4."
-    }
-  }
 }
 
-# Network rules (separate resource – replaces inline network_rule_set)
+# Network rules (version-agnostic)
 resource "azurerm_servicebus_namespace_network_rule_set" "rules" {
-  resource_group_name = var.rg_name
-  namespace_name      = azurerm_servicebus_namespace.ns.name
+  namespace_id = azurerm_servicebus_namespace.ns.id
 
-  # If any IPs provided → default deny + explicit allows; else allow all
+  # If any IPs are supplied, deny by default and allow only those; else allow all
   default_action = length(var.ip_rules) > 0 ? "Deny" : "Allow"
 
-  dynamic "ip_rule" {
-    for_each = var.ip_rules
-    content {
-      ip_mask = ip_rule.value
-      action  = "Allow"
-    }
-  }
-
-  # Add virtual_network_rule blocks later if you lock to VNets.
+  # Flat list of IP/CIDR strings, e.g. ["203.0.113.10/32"]
+  ip_rules = var.ip_rules
 }
 
 # Queues (optional)
 resource "azurerm_servicebus_queue" "q" {
-  for_each            = toset(var.queues)
-  name                = each.value
-  namespace_id        = azurerm_servicebus_namespace.ns.id
-  enable_partitioning = true
+  for_each     = toset(var.queues)
+  name         = each.value
+  namespace_id = azurerm_servicebus_namespace.ns.id
 }
 
 # Topics (optional)
@@ -55,7 +37,7 @@ resource "azurerm_servicebus_topic" "t" {
   namespace_id = azurerm_servicebus_namespace.ns.id
 }
 
-# Diagnostics
+# Diagnostics (use metric{} so it works across provider versions)
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
   name                       = "diag-sb"
@@ -66,8 +48,9 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
     category = "OperationalLogs"
   }
 
-  enabled_metric {
+  metric {
     category = "AllMetrics"
+    enabled  = true
   }
 }
 
