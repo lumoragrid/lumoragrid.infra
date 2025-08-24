@@ -20,7 +20,10 @@ variable "capacity"    {
 	default = 0 
 }          # Premium only
 
-variable "public_network_access_enabled" { type = bool default = true }
+variable "public_network_access_enabled" { 
+	type = bool 
+	default = true 
+	}
 variable "ip_rules" { 
 	type = list(string) 
 	default = [] 

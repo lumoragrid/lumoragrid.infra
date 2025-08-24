@@ -11,7 +11,10 @@ variable "tags"         {
 variable "administrator_login"           { type = string }
 variable "administrator_login_password"  { type = string }
 
-variable "public_network_access_enabled" { type = bool default = true }
+variable "public_network_access_enabled" { 
+	type = bool 
+	default = true 
+	}
 variable "sql_version" { 
 	type = string 
 	default = "12.0" 

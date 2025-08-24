@@ -1,8 +1,14 @@
 terraform {
   required_version = ">= 1.6.0"
   required_providers {
-    azurerm = { source = "hashicorp/azurerm", version = ">= 3.107.0" }
-    random  = { source = "hashicorp/random",  version = ">= 3.6.0" }
+    azurerm = { 
+        source = "hashicorp/azurerm", 
+        version = ">= 3.107.0" 
+        }
+    random  = { 
+        source = "hashicorp/random",  
+        version = ">= 3.6.0" 
+        }
   }
 }
 
@@ -24,18 +30,42 @@ variable "env"                    { type = string }
 variable "location"               { type = string }
 variable "prefix"                 { type = string }
 variable "tenant_id"              { type = string }
-variable "ip_allowlist"           { type = list(string) default = [] }
+variable "ip_allowlist"           { 
+    type = list(string) 
+    default = [] 
+    }
 
-variable "enable_private_endpoints" { type = bool default = false }
-variable "enable_diagnostics"       { type = bool default = true }
+variable "enable_private_endpoints" { 
+    type = bool 
+    default = false 
+    }
+variable "enable_diagnostics"       { 
+    type = bool 
+    default = true 
+    }
 
-variable "sb_tier"                { type = string default = "Standard" }
-variable "sb_capacity"            { type = number default = 0 }
+variable "sb_tier"                { 
+    type = string 
+    default = "Standard" 
+    }
+variable "sb_capacity"            { 
+    type = number 
+    default = 0 
+    }
 
-variable "cosmos_serverless"      { type = bool default = true }
-variable "cosmos_enable_free_tier"{ type = bool default = true }
+variable "cosmos_serverless"      { 
+    type = bool 
+    default = true 
+    }
+variable "cosmos_enable_free_tier"{ 
+    type = bool 
+    default = true 
+    }
 
-variable "sql_admin_login"        { type = string default = "sqladminuser" }
+variable "sql_admin_login"        { 
+    type = string 
+    default = "sqladminuser" 
+    }
 variable "sql_admin_password"     { type = string }
 
 # Names and random suffix for global uniqueness (storage/servicebus/cosmos)
