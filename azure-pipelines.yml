@@ -107,11 +107,11 @@ stages:
           terraform plan -var-file=dev.tfvars \
             -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
             -out=tfplan
-        env:
-            ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
-            ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
-            ARM_TENANT_ID:        $(ARM_TENANT_ID)
-            ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
+    env:
+        ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+        ARM_TENANT_ID:        $(ARM_TENANT_ID)
+        ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
 
     - task: AzureCLI@2
       displayName: Apply (dev – only on main)
@@ -122,11 +122,11 @@ stages:
         scriptLocation: inlineScript
         workingDirectory: envs/dev
         inlineScript: terraform apply -auto-approve tfplan
-      env:
-        ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
-        ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
-        ARM_TENANT_ID:        $(ARM_TENANT_ID)
-        ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
+    env:
+    ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+    ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+    ARM_TENANT_ID:        $(ARM_TENANT_ID)
+    ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
 
 # ---------- TEST ----------
 - stage: test
@@ -166,11 +166,11 @@ stages:
                   -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
                   -out=tfplan
                 terraform apply -auto-approve tfplan
-              env:
-                ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
-                ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
-                ARM_TENANT_ID:        $(ARM_TENANT_ID)
-                ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
+          env:
+            ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+            ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+            ARM_TENANT_ID:        $(ARM_TENANT_ID)
+            ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
 
 # ---------- UAT ----------
 - stage: uat
@@ -210,11 +210,11 @@ stages:
                   -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
                   -out=tfplan
                 terraform apply -auto-approve tfplan
-              env:
-                ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
-                ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
-                ARM_TENANT_ID:        $(ARM_TENANT_ID)
-                ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
+          env:
+            ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+            ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+            ARM_TENANT_ID:        $(ARM_TENANT_ID)
+            ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
 
 # ---------- PROD ----------
 - stage: prod
@@ -254,8 +254,8 @@ stages:
                   -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
                   -out=tfplan
                 terraform apply -auto-approve tfplan
-              env:
-                ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
-                ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
-                ARM_TENANT_ID:        $(ARM_TENANT_ID)
-                ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
+          env:
+            ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+            ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+            ARM_TENANT_ID:        $(ARM_TENANT_ID)
+            ARM_SUBSCRIPTION_ID:  $(AZURE_SUBSCRIPTION_ID)
