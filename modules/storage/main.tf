@@ -1,0 +1,58 @@
+resource "azurerm_storage_account" "sa" {
+  name                              = var.account_name
+  resource_group_name               = var.rg_name
+  location                          = var.location
+  account_tier                      = "Standard"
+  account_replication_type          = "LRS"
+  min_tls_version                   = "TLS1_2"
+  allow_nested_items_to_be_public   = false
+  public_network_access_enabled     = var.public_network_access_enabled
+  tags                              = var.tags
+
+  blob_properties {
+    versioning_enabled = var.enable_versioning
+    delete_retention_policy {
+      days = var.enable_soft_delete ? 7 : 0
+    }
+    container_delete_retention_policy {
+      days = var.enable_soft_delete ? 7 : 0
+    }
+  }
+}
+
+# Diagnostics (metrics only for portability)
+resource "azurerm_monitor_diagnostic_setting" "diag" {
+  count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
+  name                       = "diag-storage"
+  target_resource_id         = azurerm_storage_account.sa.id
+  log_analytics_workspace_id = var.la_workspace_id
+
+  metric {
+    category = "AllMetrics"
+    enabled  = true
+  }
+}
+
+# Private Endpoint (blob subresource)
+resource "azurerm_private_endpoint" "pe" {
+  count               = var.enable_private_endpoints && var.pe_subnet_id != null ? 1 : 0
+  name                = "${var.account_name}-pe-blob"
+  location            = var.location
+  resource_group_name = var.rg_name
+  subnet_id           = var.pe_subnet_id
+
+  private_service_connection {
+    name                           = "blob-connection"
+    private_connection_resource_id = azurerm_storage_account.sa.id
+    is_manual_connection           = false
+    subresource_names              = ["blob"]
+  }
+
+  dynamic "private_dns_zone_group" {
+    for_each = length(var.private_dns_zone_ids) > 0 ? [1] : []
+    content {
+      name                 = "blob-dns"
+      private_dns_zone_ids = var.private_dns_zone_ids
+    }
+  }
+}
