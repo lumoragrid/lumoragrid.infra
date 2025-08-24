@@ -97,7 +97,7 @@ module "monitor" {
   name_prefix    = local.name_prefix
   location       = var.location
   rg_name        = module.rg.name
-  retention_days = var.env == "prod" ? 30 : (var.env == "uat" ? 30 : 14)
+  retention_days = var.env == "prod" ? 30 : (var.env == "uat" ? 30 : 30)
   tags           = local.tags
 }
 
