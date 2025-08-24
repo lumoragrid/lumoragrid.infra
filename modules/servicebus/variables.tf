@@ -24,11 +24,7 @@ variable "sb_tier" {
 variable "capacity" {
   type    = number
   default = 1
-  # Premium only; valid values are 1, 2, or 4
-  validation {
-    condition     = var.sb_tier != "Premium" || contains([1, 2, 4], var.capacity)
-    error_message = "When sb_tier is \"Premium\", capacity must be 1, 2, or 4."
-  }
+  # We’ll enforce the Premium rule in the resource precondition (see below).
 }
 
 variable "public_network_access_enabled" {

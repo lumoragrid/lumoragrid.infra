@@ -8,6 +8,17 @@ resource "azurerm_servicebus_namespace" "ns" {
   public_network_access_enabled = var.public_network_access_enabled
   minimum_tls_version           = "1.2"
   tags                          = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = contains(["Basic", "Standard", "Premium"], var.sb_tier)
+      error_message = "sb_tier must be one of: Basic, Standard, Premium."
+    }
+    precondition {
+      condition     = var.sb_tier != "Premium" || contains([1, 2, 4], var.capacity)
+      error_message = "When sb_tier is \"Premium\", capacity must be 1, 2, or 4."
+    }
+  }
 }
 
 # Network rules (separate resource – replaces inline network_rule_set)
