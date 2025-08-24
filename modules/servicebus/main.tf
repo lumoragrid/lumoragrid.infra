@@ -43,7 +43,7 @@ resource "azurerm_servicebus_topic" "t" {
 
 # Diagnostics (use metric{} so it works across provider versions)
 resource "azurerm_monitor_diagnostic_setting" "diag" {
-  count                      = var.enable_diagnostics 1 : 0
+  count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-sb"
   target_resource_id         = azurerm_servicebus_namespace.ns.id
   log_analytics_workspace_id = var.la_workspace_id
