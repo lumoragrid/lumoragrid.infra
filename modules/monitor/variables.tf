@@ -9,9 +9,13 @@ variable "rg_name" {
 }
 variable "retention_days" {
   type    = number
-  default = 14
+  default = 30
 }
 variable "tags" {
   type    = map(string)
   default = {}
+}
+variable "law_sku" {
+  type    = string
+  default = "PerGB2018"
 }

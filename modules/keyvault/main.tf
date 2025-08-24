@@ -25,7 +25,7 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
 
 # Private Endpoint (vault)
 resource "azurerm_private_endpoint" "pe" {
-  count               = var.enable_private_endpoints && var.pe_subnet_id != null ? 1 : 0
+  count               = var.enable_private_endpoints ? 1 : 0
   name                = "${var.name}-pe"
   location            = var.location
   resource_group_name = var.rg_name
@@ -43,6 +43,13 @@ resource "azurerm_private_endpoint" "pe" {
     content {
       name                 = "kv-dns"
       private_dns_zone_ids = var.private_dns_zone_ids
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = var.enable_private_endpoints == false || var.pe_subnet_id != null
+      error_message = "When enable_private_endpoints=true, pe_subnet_id must be provided."
     }
   }
 }
