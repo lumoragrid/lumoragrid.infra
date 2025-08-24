@@ -42,7 +42,10 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
   target_resource_id         = azurerm_servicebus_namespace.ns.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { category = "AllMetrics" enabled = true }
+  metric { 
+    category = "AllMetrics" 
+    enabled = true 
+    }
 }
 
 resource "azurerm_private_endpoint" "pe" {

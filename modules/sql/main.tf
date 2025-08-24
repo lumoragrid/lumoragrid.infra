@@ -24,7 +24,10 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
   target_resource_id         = azurerm_mssql_server.server.id
   log_analytics_workspace_id = var.la_workspace_id
 
-  metric { category = "AllMetrics" enabled = true }
+  metric { 
+    category = "AllMetrics" 
+    enabled = true 
+    }
 }
 
 resource "azurerm_private_endpoint" "pe" {
