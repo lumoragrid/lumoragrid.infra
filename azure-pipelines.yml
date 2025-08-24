@@ -113,7 +113,7 @@ stages:
         workingDirectory: envs/dev
         inlineScript: |
           set -e
-          terraform init -reconfigure \
+          terraform init -reconfigure -upgrade  \
             -backend-config="resource_group_name=$(TFSTATE_RG)" \
             -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
             -backend-config="container_name=$(TFSTATE_CONTAINER)" \
@@ -172,7 +172,7 @@ stages:
               workingDirectory: envs/test
               inlineScript: |
                 set -e
-                terraform init -reconfigure \
+                terraform init -reconfigure -upgrade \
                   -backend-config="resource_group_name=$(TFSTATE_RG)" \
                   -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
                   -backend-config="container_name=$(TFSTATE_CONTAINER)" \
@@ -217,7 +217,7 @@ stages:
               workingDirectory: envs/uat
               inlineScript: |
                 set -e
-                terraform init -reconfigure \
+                terraform init -reconfigure -upgrade \
                   -backend-config="resource_group_name=$(TFSTATE_RG)" \
                   -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
                   -backend-config="container_name=$(TFSTATE_CONTAINER)" \
@@ -262,7 +262,7 @@ stages:
               workingDirectory: envs/prod
               inlineScript: |
                 set -e
-                terraform init -reconfigure \
+                terraform init -reconfigure -upgrade \
                   -backend-config="resource_group_name=$(TFSTATE_RG)" \
                   -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
                   -backend-config="container_name=$(TFSTATE_CONTAINER)" \

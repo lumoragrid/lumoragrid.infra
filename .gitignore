@@ -9,3 +9,5 @@
 # Terraform lockfiles
 .terraform.lock.hcl
 **/.terraform.lock.hcl
+/.vs/lumoragrid.infra/v17/DocumentLayout.json
+/.vs/lumoragrid.infra/v17/.wsuo
