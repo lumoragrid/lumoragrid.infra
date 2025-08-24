@@ -1,7 +1,7 @@
 env      = "test"
 location = "australiaeast"
 prefix   = "lg"
-tenant_id = "00000000-0000-0000-0000-000000000000"  # <-- update with your AAD tenant ID
+tenant_id = "75569a98-0ea1-45b2-8b41-49b53465e6af"  # <-- update with your AAD tenant ID
 
 # Feature flags
 enable_private_endpoints = false
@@ -18,4 +18,3 @@ cosmos_enable_free_tier = true
 
 # SQL admin (set via pipeline/secret in real usage)
 sql_admin_login    = "sqladminuser"
-sql_admin_password = "CHANGE_ME_STRONG_PASSWORD"
