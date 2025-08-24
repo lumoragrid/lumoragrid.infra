@@ -34,7 +34,7 @@ resource "azurerm_cosmosdb_account" "acct" {
 
 # Diagnostics (new syntax avoids the 'metric' deprecation warning)
 resource "azurerm_monitor_diagnostic_setting" "diag" {
-  count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
+  count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-cosmos"
   target_resource_id         = azurerm_cosmosdb_account.acct.id
   log_analytics_workspace_id = var.la_workspace_id

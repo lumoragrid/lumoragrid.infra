@@ -3,28 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\azure-pipelines.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:azure-pipelines.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\storage\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\dev\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\sql\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\servicebus\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\servicebus\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\cosmos\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\cosmos\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -39,16 +27,60 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\prod\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\dev\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\dev.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\dev\\dev.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\storage\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\identity\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\monitor\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\monitor\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\cosmos\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\keyvault\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\.terraform\\terraform.tfstate||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\dev\\.terraform\\terraform.tfstate||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\azure-pipelines.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:azure-pipelines.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\servicebus\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\cosmos\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\backend.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\prod\\backend.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\prod.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\prod\\prod.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\dev.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:envs\\dev\\dev.tfvars||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\backend.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -67,10 +99,6 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\keyvault\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\monitor\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\network\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -83,36 +111,12 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\sql\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\storage\\variables.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\storage\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\sql\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\resource-group\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\network\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\monitor\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\keyvault\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:modules\\identity\\main.tf||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\outputs.tf||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -158,37 +162,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 17,
+          "SelectedChildIndex": 15,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\sql\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\variables.tf",
-              "RelativeToolTip": "modules\\sql\\variables.tf",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T05:02:24.659Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\variables.tf",
-              "RelativeDocumentMoniker": "envs\\uat\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\variables.tf",
-              "RelativeToolTip": "envs\\uat\\variables.tf",
+              "DocumentIndex": 14,
+              "Title": "terraform.tfstate",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\.terraform\\terraform.tfstate",
+              "RelativeDocumentMoniker": "envs\\dev\\.terraform\\terraform.tfstate",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\.terraform\\terraform.tfstate",
+              "RelativeToolTip": "envs\\dev\\.terraform\\terraform.tfstate",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:57:06.149Z",
+              "WhenOpened": "2025-08-24T07:27:37.961Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 16,
               "Title": "variables.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\variables.tf",
               "RelativeDocumentMoniker": "modules\\servicebus\\variables.tf",
@@ -201,72 +192,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\resource-group\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\variables.tf",
-              "RelativeToolTip": "modules\\resource-group\\variables.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:48:06.13Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 17,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\network\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\variables.tf",
-              "RelativeToolTip": "modules\\network\\variables.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:47:45.905Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\monitor\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf",
-              "RelativeToolTip": "modules\\monitor\\variables.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:47:29.423Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\keyvault\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\variables.tf",
-              "RelativeToolTip": "modules\\keyvault\\variables.tf",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:46:54.068Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\identity\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\variables.tf",
-              "RelativeToolTip": "modules\\identity\\variables.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:46:46.465Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
               "Title": "variables.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\variables.tf",
               "RelativeDocumentMoniker": "modules\\cosmos\\variables.tf",
@@ -279,20 +205,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\main.tf",
               "RelativeDocumentMoniker": "envs\\uat\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\main.tf",
               "RelativeToolTip": "envs\\uat\\main.tf",
-              "ViewState": "AgIAADQAAAAAAAAAAAAuwEoAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAAAF0AAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:31:00.534Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 20,
               "Title": "backend.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\backend.tf",
               "RelativeDocumentMoniker": "envs\\dev\\backend.tf",
@@ -305,46 +231,46 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 7,
               "Title": "dev.tfvars",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\dev.tfvars",
               "RelativeDocumentMoniker": "envs\\dev\\dev.tfvars",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\dev.tfvars",
               "RelativeToolTip": "envs\\dev\\dev.tfvars",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAMAAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:39:03.477Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\main.tf",
               "RelativeDocumentMoniker": "envs\\dev\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\main.tf",
               "RelativeToolTip": "envs\\dev\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAAAF8AAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:30:23.642Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 19,
               "Title": "prod.tfvars",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\prod.tfvars",
               "RelativeDocumentMoniker": "envs\\prod\\prod.tfvars",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\prod.tfvars",
               "RelativeToolTip": "envs\\prod\\prod.tfvars",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:40:55.768Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 18,
               "Title": "backend.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\backend.tf",
               "RelativeDocumentMoniker": "envs\\prod\\backend.tf",
@@ -357,33 +283,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 5,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\main.tf",
               "RelativeDocumentMoniker": "envs\\prod\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\prod\\main.tf",
               "RelativeToolTip": "envs\\prod\\main.tf",
-              "ViewState": "AgIAAK4AAAAAAAAAAAAuwMQAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGMAAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:30:40.808Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\test\\main.tf",
               "RelativeDocumentMoniker": "envs\\test\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\test\\main.tf",
               "RelativeToolTip": "envs\\test\\main.tf",
-              "ViewState": "AgIAADcAAAAAAAAAAAAuwE0AAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAAAF0AAABHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:30:51.2Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 15,
               "Title": "azure-pipelines.yml",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\azure-pipelines.yml",
               "RelativeDocumentMoniker": "azure-pipelines.yml",
@@ -396,13 +322,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 12,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\main.tf",
               "RelativeDocumentMoniker": "modules\\cosmos\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\main.tf",
               "RelativeToolTip": "modules\\cosmos\\main.tf",
-              "ViewState": "AgIAAD8AAAAAAAAAAAAAAEYAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADAAAAAAAAAAAAAowFIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:56:55.745Z",
               "EditorCaption": ""
@@ -415,105 +341,79 @@
               "RelativeDocumentMoniker": "modules\\servicebus\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\main.tf",
               "RelativeToolTip": "modules\\servicebus\\main.tf",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAowC4AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T05:01:43.647Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "variables.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf",
-              "RelativeDocumentMoniker": "modules\\storage\\variables.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf",
-              "RelativeToolTip": "modules\\storage\\variables.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T05:04:28.238Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "main.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf",
-              "RelativeDocumentMoniker": "modules\\storage\\main.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf",
-              "RelativeToolTip": "modules\\storage\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T05:02:45.109Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 1,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\main.tf",
               "RelativeDocumentMoniker": "modules\\sql\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\main.tf",
               "RelativeToolTip": "modules\\sql\\main.tf",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAAB0AAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABUAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T05:02:30.078Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 0,
               "Title": "main.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\main.tf",
-              "RelativeDocumentMoniker": "modules\\resource-group\\main.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\main.tf",
-              "RelativeToolTip": "modules\\resource-group\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf",
+              "RelativeDocumentMoniker": "modules\\storage\\main.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\main.tf",
+              "RelativeToolTip": "modules\\storage\\main.tf",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABgAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T04:52:07.092Z",
+              "WhenOpened": "2025-08-24T05:02:45.109Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "main.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\main.tf",
-              "RelativeDocumentMoniker": "modules\\network\\main.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\main.tf",
-              "RelativeToolTip": "modules\\network\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T05:01:36.264Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "main.tf",
-              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf",
-              "RelativeDocumentMoniker": "modules\\monitor\\main.tf",
-              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf",
-              "RelativeToolTip": "modules\\monitor\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-08-24T05:01:31.369Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 13,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\main.tf",
               "RelativeDocumentMoniker": "modules\\keyvault\\main.tf",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\main.tf",
               "RelativeToolTip": "modules\\keyvault\\main.tf",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAowDcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T05:01:06.676Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 10,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\monitor\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\variables.tf",
+              "RelativeToolTip": "modules\\monitor\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:47:29.423Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "main.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf",
+              "RelativeDocumentMoniker": "modules\\monitor\\main.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\monitor\\main.tf",
+              "RelativeToolTip": "modules\\monitor\\main.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T05:01:31.369Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "main.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\main.tf",
               "RelativeDocumentMoniker": "modules\\identity\\main.tf",
@@ -526,7 +426,124 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\storage\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\storage\\variables.tf",
+              "RelativeToolTip": "modules\\storage\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T05:04:28.238Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\variables.tf",
+              "RelativeDocumentMoniker": "envs\\uat\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\variables.tf",
+              "RelativeToolTip": "envs\\uat\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:57:06.149Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\identity\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\identity\\variables.tf",
+              "RelativeToolTip": "modules\\identity\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:46:46.465Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\keyvault\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\keyvault\\variables.tf",
+              "RelativeToolTip": "modules\\keyvault\\variables.tf",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAADAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:46:54.068Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\network\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\variables.tf",
+              "RelativeToolTip": "modules\\network\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:47:45.905Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\resource-group\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\variables.tf",
+              "RelativeToolTip": "modules\\resource-group\\variables.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:48:06.13Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "variables.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\variables.tf",
+              "RelativeDocumentMoniker": "modules\\sql\\variables.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\sql\\variables.tf",
+              "RelativeToolTip": "modules\\sql\\variables.tf",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T05:02:24.659Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "main.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\main.tf",
+              "RelativeDocumentMoniker": "modules\\resource-group\\main.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\main.tf",
+              "RelativeToolTip": "modules\\resource-group\\main.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T04:52:07.092Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 28,
+              "Title": "main.tf",
+              "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\main.tf",
+              "RelativeDocumentMoniker": "modules\\network\\main.tf",
+              "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\network\\main.tf",
+              "RelativeToolTip": "modules\\network\\main.tf",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-08-24T05:01:36.264Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
               "Title": "outputs.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\cosmos\\outputs.tf",
               "RelativeDocumentMoniker": "modules\\cosmos\\outputs.tf",
@@ -539,7 +556,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "outputs.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\resource-group\\outputs.tf",
               "RelativeDocumentMoniker": "modules\\resource-group\\outputs.tf",
@@ -552,7 +569,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "outputs.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\modules\\servicebus\\outputs.tf",
               "RelativeDocumentMoniker": "modules\\servicebus\\outputs.tf",
@@ -565,33 +582,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": "uat.tfvars",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\uat.tfvars",
               "RelativeDocumentMoniker": "envs\\uat\\uat.tfvars",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\uat.tfvars",
               "RelativeToolTip": "envs\\uat\\uat.tfvars",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:41:15.279Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "test.tfvars",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\test\\test.tfvars",
               "RelativeDocumentMoniker": "envs\\test\\test.tfvars",
               "ToolTip": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\test\\test.tfvars",
               "RelativeToolTip": "envs\\test\\test.tfvars",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-08-24T04:41:07.525Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 32,
               "Title": "variables.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\dev\\variables.tf",
               "RelativeDocumentMoniker": "envs\\dev\\variables.tf",
@@ -604,7 +621,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "backend.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\uat\\backend.tf",
               "RelativeDocumentMoniker": "envs\\uat\\backend.tf",
@@ -617,7 +634,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 36,
               "Title": "backend.tf",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\envs\\test\\backend.tf",
               "RelativeDocumentMoniker": "envs\\test\\backend.tf",
@@ -630,7 +647,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 37,
               "Title": "ProjectSettings.json",
               "DocumentMoniker": "C:\\Users\\balan\\source\\repos\\LumoraGrid\\Infrastructure\\lumoragrid.infra\\.vs\\ProjectSettings.json",
               "RelativeDocumentMoniker": ".vs\\ProjectSettings.json",

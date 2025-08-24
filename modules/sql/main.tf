@@ -19,7 +19,7 @@ resource "azurerm_mssql_database" "db" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "diag" {
-  count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
+  count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-sql"
   target_resource_id         = azurerm_mssql_server.server.id
   log_analytics_workspace_id = var.la_workspace_id

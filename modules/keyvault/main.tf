@@ -12,7 +12,7 @@ resource "azurerm_key_vault" "kv" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "diag" {
-  count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
+  count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-kv"
   target_resource_id         = azurerm_key_vault.kv.id
   log_analytics_workspace_id = var.la_workspace_id

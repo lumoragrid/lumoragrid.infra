@@ -22,7 +22,7 @@ resource "azurerm_storage_account" "sa" {
 
 # Diagnostics (metrics only for portability)
 resource "azurerm_monitor_diagnostic_setting" "diag" {
-  count                      = var.enable_diagnostics && var.la_workspace_id != null ? 1 : 0
+  count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-storage"
   target_resource_id         = azurerm_storage_account.sa.id
   log_analytics_workspace_id = var.la_workspace_id
