@@ -1,206 +1,236 @@
-# Azure DevOps multi-stage pipeline for LumoraGrid (Terraform)
-# - Uses AzureCLI@2 with an Azure RM service connection (OIDC-supported)
-# - Plans on PR (dev only), Plans+Applies on main with Environments (dev/test/uat/prod)
-# - Assumes remote state Storage is available (configure in variable groups)
-# - Requires environment approvals configured in ADO UI for test/uat/prod
+﻿# LumoraGrid Terraform – Azure DevOps (bootstrap + dev→test→uat→prod)
 
 trigger:
-  branches:
-    include: [ main ]
-  paths:
-    include:
-      - envs/**
-      - modules/**
+  branches: { include: [ main ] }
+  paths: { include: [ envs/**, modules/**, azure-pipelines.yml ] }
 
 pr:
-  branches:
-    include: [ main, feature/* ]
-  paths:
-    include:
-      - envs/**
-      - modules/**
+  branches: { include: [ main, feature/* ] }
+  paths: { include: [ envs/**, modules/**, azure-pipelines.yml ] }
 
 variables:
-  - name: TF_VERSION
-    value: '1.7.5'
-  # Optional shared variable group for storage account, container, etc.
-  # - group: lumoragrid-shared
+- group: lumoragrid-shared
+- name: TF_VERSION
+  value: '1.7.5'
 
 stages:
-# ------------------------ DEV ------------------------
-- stage: dev
-  displayName: DEV (plan/apply)
+# ---------- BOOTSTRAP (idempotent): state + provider registration ----------
+- stage: bootstrap
+  displayName: Bootstrap (tfstate + providers)
   jobs:
-  - job: terraform_dev
-    displayName: Terraform DEV
-    pool:
-      vmImage: ubuntu-latest
+  - job: bootstrap_job
+    displayName: Ensure tfstate + register providers
+    pool: { vmImage: ubuntu-latest }
     steps:
     - task: AzureCLI@2
-      displayName: 'Azure Login (Service Connection)'
+      displayName: Azure login
       inputs:
-        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'   # create in ADO project settings
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: az account show
+
+    - task: AzureCLI@2
+      displayName: Create/ensure tfstate RG + Storage + Container
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Logged into Azure using the service connection."
-          az account show
+          set -euo pipefail
+          RG="$(TFSTATE_RG)"
+          SA="$(TFSTATE_ACCOUNT)"
+          CN="$(TFSTATE_CONTAINER)"
+          LOC="$(LOCATION)"
 
-    # Install Terraform (or use TerraformInstaller@1 if the extension is available)
+          az group show -n "$RG" >/dev/null 2>&1 || az group create -n "$RG" -l "$LOC"
+
+          if ! az storage account show -g "$RG" -n "$SA" >/dev/null 2>&1; then
+            az storage account create -n "$SA" -g "$RG" -l "$LOC" --sku Standard_LRS --kind StorageV2 --min-tls-version TLS1_2
+            az storage account blob-service-properties update \
+              --account-name "$SA" \
+              --enable-versioning true \
+              --enable-delete-retention true \
+              --delete-retention-days 7 \
+              --enable-container-delete-retention true \
+              --container-delete-retention-days 7
+          fi
+
+          ACCOUNT_KEY=$(az storage account keys list -g "$RG" -n "$SA" --query [0].value -o tsv)
+          az storage container create --name "$CN" --account-name "$SA" --account-key "$ACCOUNT_KEY" >/dev/null || true
+          echo "tfstate ready: rg=$RG sa=$SA container=$CN"
+
+    - task: AzureCLI@2
+      displayName: Register resource providers
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e
+          for p in Microsoft.Storage Microsoft.KeyVault Microsoft.DocumentDB Microsoft.ServiceBus Microsoft.Sql Microsoft.Insights Microsoft.Network; do
+            az provider register --namespace $p --wait
+          done
+          echo "Providers registered."
+
+# ---------- DEV ----------
+- stage: dev
+  displayName: DEV (plan/apply)
+  dependsOn: bootstrap
+  jobs:
+  - job: tf_dev
+    displayName: Terraform DEV
+    pool: { vmImage: ubuntu-latest }
+    steps:
     - script: |
         set -e
         curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
         sudo unzip -o tf.zip -d /usr/local/bin
         terraform -version
-      displayName: 'Install Terraform $(TF_VERSION)'
+      displayName: Install Terraform
 
-    - script: |
-        set -e
-        cd envs/dev
-        terraform init \
-          -backend-config="resource_group_name=$(TFSTATE_RG)" \
-          -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
-          -backend-config="container_name=$(TFSTATE_CONTAINER)" \
-          -backend-config="key=lumoragrid-dev.tfstate"
-        terraform validate
-        terraform plan -var-file=dev.tfvars -out=tfplan
-      displayName: 'Terraform plan (dev)'
-      env:
-        ARM_USE_OIDC: "true"
+    - task: AzureCLI@2
+      displayName: Init + Plan (dev)
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        workingDirectory: envs/dev
+        inlineScript: |
+          set -e
+          terraform init -reconfigure \
+            -backend-config="resource_group_name=$(TFSTATE_RG)" \
+            -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
+            -backend-config="container_name=$(TFSTATE_CONTAINER)" \
+            -backend-config="key=lumoragrid-dev.tfstate"
+          terraform validate
+          terraform plan -var-file=dev.tfvars \
+            -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
+            -out=tfplan
 
-    # Apply only on pushes to main (not on PRs)
-    - script: |
-        set -e
-        cd envs/dev
-        terraform apply -auto-approve tfplan
-      displayName: 'Terraform apply (dev)'
-      condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
+    - task: AzureCLI@2
+      displayName: Apply (dev – only on main)
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        workingDirectory: envs/dev
+        inlineScript: terraform apply -auto-approve tfplan
 
-# ------------------------ TEST ------------------------
+# ---------- TEST ----------
 - stage: test
   displayName: TEST (plan/apply)
   dependsOn: dev
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
-  - deployment: terraform_test
+  - deployment: tf_test
     displayName: Terraform TEST
-    environment: 'test'   # Configure approvals/checks in ADO UI
+    environment: 'test'
     strategy:
       runOnce:
         deploy:
           steps:
-          - task: AzureCLI@2
-            displayName: 'Azure Login'
-            inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: az account show
-
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
               sudo unzip -o tf.zip -d /usr/local/bin
               terraform -version
-            displayName: 'Install Terraform $(TF_VERSION)'
+            displayName: Install Terraform
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (test)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: envs/test
+              inlineScript: |
+                set -e
+                terraform init -reconfigure \
+                  -backend-config="resource_group_name=$(TFSTATE_RG)" \
+                  -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
+                  -backend-config="container_name=$(TFSTATE_CONTAINER)" \
+                  -backend-config="key=lumoragrid-test.tfstate"
+                terraform validate
+                terraform plan -var-file=test.tfvars \
+                  -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
+                  -out=tfplan
+                terraform apply -auto-approve tfplan
 
-          - script: |
-              set -e
-              cd envs/test
-              terraform init \
-                -backend-config="resource_group_name=$(TFSTATE_RG)" \
-                -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
-                -backend-config="container_name=$(TFSTATE_CONTAINER)" \
-                -backend-config="key=lumoragrid-test.tfstate"
-              terraform validate
-              terraform plan -var-file=test.tfvars -out=tfplan
-              terraform apply -auto-approve tfplan
-            displayName: 'Terraform plan+apply (test)'
-            env:
-              ARM_USE_OIDC: "true"
-
-# ------------------------ UAT ------------------------
+# ---------- UAT ----------
 - stage: uat
   displayName: UAT (plan/apply)
   dependsOn: test
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
-  - deployment: terraform_uat
+  - deployment: tf_uat
     displayName: Terraform UAT
-    environment: 'uat'    # Configure approvals/checks in ADO UI
+    environment: 'uat'
     strategy:
       runOnce:
         deploy:
           steps:
-          - task: AzureCLI@2
-            displayName: 'Azure Login'
-            inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: az account show
-
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
               sudo unzip -o tf.zip -d /usr/local/bin
               terraform -version
-            displayName: 'Install Terraform $(TF_VERSION)'
+            displayName: Install Terraform
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (uat)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: envs/uat
+              inlineScript: |
+                set -e
+                terraform init -reconfigure \
+                  -backend-config="resource_group_name=$(TFSTATE_RG)" \
+                  -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
+                  -backend-config="container_name=$(TFSTATE_CONTAINER)" \
+                  -backend-config="key=lumoragrid-uat.tfstate"
+                terraform validate
+                terraform plan -var-file=uat.tfvars \
+                  -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
+                  -out=tfplan
+                terraform apply -auto-approve tfplan
 
-          - script: |
-              set -e
-              cd envs/uat
-              terraform init \
-                -backend-config="resource_group_name=$(TFSTATE_RG)" \
-                -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
-                -backend-config="container_name=$(TFSTATE_CONTAINER)" \
-                -backend-config="key=lumoragrid-uat.tfstate"
-              terraform validate
-              terraform plan -var-file=uat.tfvars -out=tfplan
-              terraform apply -auto-approve tfplan
-            displayName: 'Terraform plan+apply (uat)'
-            env:
-              ARM_USE_OIDC: "true"
-
-# ------------------------ PROD ------------------------
+# ---------- PROD ----------
 - stage: prod
   displayName: PROD (plan/apply)
   dependsOn: uat
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   jobs:
-  - deployment: terraform_prod
+  - deployment: tf_prod
     displayName: Terraform PROD
-    environment: 'prod'   # Configure approvals/checks in ADO UI
+    environment: 'prod'
     strategy:
       runOnce:
         deploy:
           steps:
-          - task: AzureCLI@2
-            displayName: 'Azure Login'
-            inputs:
-              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: az account show
-
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
               sudo unzip -o tf.zip -d /usr/local/bin
               terraform -version
-            displayName: 'Install Terraform $(TF_VERSION)'
-
-          - script: |
-              set -e
-              cd envs/prod
-              terraform init \
-                -backend-config="resource_group_name=$(TFSTATE_RG)" \
-                -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
-                -backend-config="container_name=$(TFSTATE_CONTAINER)" \
-                -backend-config="key=lumoragrid-prod.tfstate"
-              terraform validate
-              terraform plan -var-file=prod.tfvars -out=tfplan
-              terraform apply -auto-approve tfplan
-            displayName: 'Terraform plan+apply (prod)'
-            env:
-              ARM_USE_OIDC: "true"
+            displayName: Install Terraform
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (prod)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: envs/prod
+              inlineScript: |
+                set -e
+                terraform init -reconfigure \
+                  -backend-config="resource_group_name=$(TFSTATE_RG)" \
+                  -backend-config="storage_account_name=$(TFSTATE_ACCOUNT)" \
+                  -backend-config="container_name=$(TFSTATE_CONTAINER)" \
+                  -backend-config="key=lumoragrid-prod.tfstate"
+                terraform validate
+                terraform plan -var-file=prod.tfvars \
+                  -var "sql_admin_password=$(SQL_ADMIN_PASSWORD)" \
+                  -out=tfplan
+                terraform apply -auto-approve tfplan
