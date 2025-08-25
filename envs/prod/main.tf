@@ -68,12 +68,6 @@ variable "sql_admin_login" {
 }
 variable "sql_admin_password" { type = string }
 
-# Names and random suffix for global uniqueness (storage/servicebus/cosmos)
-resource "random_id" "suffix" {
-  byte_length = 3
-  keepers     = { env = var.env }
-}
-
 locals {
   name_prefix = "${var.prefix}-${var.env}"
   rg_name     = "rg-${var.prefix}-${var.env}-core"
@@ -117,7 +111,7 @@ module "network" {
 # Storage (blob)
 module "storage" {
   source                        = "../../modules/storage"
-  account_name                  = lower(replace("${var.prefix}${var.env}${random_id.suffix.hex}", "-", ""))
+  account_name                  = lower(replace("${var.prefix}${var.env}", "-", ""))
   location                      = var.location
   rg_name                       = module.rg.name
   enable_diagnostics            = var.enable_diagnostics
@@ -131,7 +125,7 @@ module "storage" {
 # Key Vault
 module "keyvault" {
   source                        = "../../modules/keyvault"
-  name                          = "kv-${var.prefix}-${var.env}-${random_id.suffix.hex}"
+  name                          = "kv-${var.prefix}-${var.env}"
   location                      = var.location
   rg_name                       = module.rg.name
   tenant_id                     = var.tenant_id
@@ -147,7 +141,7 @@ module "keyvault" {
 # Service Bus
 module "servicebus" {
   source                        = "../../modules/servicebus"
-  name                          = "sb-${var.prefix}-${var.env}-${random_id.suffix.hex}"
+  name                          = "sb-${var.prefix}-${var.env}"
   location                      = var.location
   rg_name                       = module.rg.name
   sb_tier                       = var.sb_tier
@@ -175,7 +169,7 @@ module "servicebus" {
 # Cosmos DB (Core SQL API)
 module "cosmos" {
   source                        = "../../modules/cosmos"
-  name                          = "cos-${var.prefix}-${var.env}-${random_id.suffix.hex}"
+  name                          = "cos-${var.prefix}-${var.env}"
   location                      = var.location
   rg_name                       = module.rg.name
   cosmos_serverless             = var.cosmos_serverless
@@ -191,7 +185,7 @@ module "cosmos" {
 # SQL (POC: SQL login; later switch to AAD-only and Private Link)
 module "sql" {
   source                       = "../../modules/sql"
-  server_name                  = "sql-${var.prefix}-${var.env}-${random_id.suffix.hex}"
+  server_name                  = "sql-${var.prefix}-${var.env}"
   db_name                      = "sqldb_${var.prefix}_${var.env}"
   location                     = var.location
   rg_name                      = module.rg.name

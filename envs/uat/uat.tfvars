@@ -1,6 +1,6 @@
 env       = "uat"
-location  = "australiaeast"
-prefix    = "lg"
+location  = "australiasoutheast"
+prefix    = "lumoragrid"
 tenant_id = "75569a98-0ea1-45b2-8b41-49b53465e6af" # <-- update with your AAD tenant ID
 
 # Feature flags
