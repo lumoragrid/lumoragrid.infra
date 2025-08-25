@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\envs",
+    "\\envs\\dev",
+    "\\envs\\prod",
+    "\\envs\\test",
+    "\\envs\\uat",
+    "\\modules",
+    "\\modules\\servicebus",
+    "\\modules\\sql",
+    "\\modules\\storage"
+  ],
+  "SelectedNode": "\\envs\\prod\\prod.tfvars",
+  "PreviewInSolutionExplorer": false
+}

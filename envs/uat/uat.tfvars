@@ -18,3 +18,6 @@ cosmos_enable_free_tier = true
 
 # SQL admin (set via pipeline/secret in real usage)
 sql_admin_login = "sqladminuser"
+
+law_sku        = "PerGB2018"  # or "Free"
+retention_days = 30           # ignored if law_sku == "Free"
