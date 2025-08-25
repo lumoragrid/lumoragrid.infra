@@ -30,6 +30,13 @@ resource "azurerm_servicebus_namespace" "ns" {
         ignore_missing_vnet_service_endpoint = false
       }
     }
+
+    lifecycle {
+      precondition {
+          condition     = var.sb_tier != "Premium" || var.capacity >= 1
+          error_message = "When sb_tier is Premium, capacity must be >= 1."
+      }
+    }
   }
 }
 
@@ -61,6 +68,13 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
   metric {
     category = "AllMetrics"
     enabled  = true
+  }
+
+  lifecycle {
+    precondition {
+      condition     = var.la_workspace_id != null && length(var.la_workspace_id) > 0
+      error_message = "la_workspace_id must be provided when enable_diagnostics = true."
+    }
   }
 }
 

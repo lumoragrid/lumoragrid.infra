@@ -34,8 +34,9 @@ variable "capacity" {
   default     = 1
   description = "Messaging units for Premium only (ignored for Basic/Standard)."
   validation {
-    condition     = var.sb_tier != "Premium" || var.capacity >= 1
-    error_message = "capacity must be >= 1 when sb_tier is Premium."
+    # Can only refer to var.capacity here
+    condition     = var.capacity >= 1
+    error_message = "capacity must be >= 1 (used only when sb_tier is Premium)."
   }
 }
 
@@ -74,11 +75,7 @@ variable "enable_diagnostics" {
 variable "la_workspace_id" {
   type        = string
   default     = null
-  description = "Log Analytics workspace resource ID (required if enable_diagnostics = true)."
-  validation {
-    condition     = var.enable_diagnostics == false || try(length(var.la_workspace_id) > 0, false)
-    error_message = "la_workspace_id must be set when enable_diagnostics is true."
-  }
+  description = "Log Analytics workspace resource ID (required when enable_diagnostics = true)."
 }
 
 # Entities
