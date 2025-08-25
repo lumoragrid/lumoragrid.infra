@@ -1,6 +1,6 @@
 # modules/servicebus/main.tf
 
-# Namespace
+# Namespace (v4-style inline network rules)
 resource "azurerm_servicebus_namespace" "ns" {
   name                          = var.name
   location                      = var.location
@@ -11,20 +11,26 @@ resource "azurerm_servicebus_namespace" "ns" {
   minimum_tls_version           = "1.2"
   tags                          = var.tags
 
+  # Inline network rules (replaces azurerm_servicebus_namespace_network_rule_set)
   network_rule_set {
-    default_action = length(var.ip_rules) > 0 ? "Deny" : "Allow"
-    ip_rules       = var.ip_rules
+    # If you specify any ip_rules or network_rules, default_action must be "Deny"
+    default_action = (length(var.ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+
+    # Flat list of IP/CIDR strings, e.g. ["203.0.113.10/32"]
+    ip_rules = var.ip_rules
+
+    # Allow Microsoft trusted services to bypass rules (optional)
+    trusted_service_access_enabled = try(var.trusted_services_enabled, false)
+
+    # Optional VNet subnet rules
+    dynamic "network_rules" {
+      for_each = try(var.subnet_ids, [])
+      content {
+        subnet_id                            = network_rules.value
+        ignore_missing_vnet_service_endpoint = false
+      }
+    }
   }
-}
-# Network rules (version-agnostic)
-resource "azurerm_servicebus_namespace_network_rule_set" "rules" {
-  namespace_id = azurerm_servicebus_namespace.ns.id
-
-  # If any IPs are supplied, deny by default and allow only those; else allow all
-  default_action = length(var.ip_rules) > 0 ? "Deny" : "Allow"
-
-  # Flat list of IP/CIDR strings, e.g. ["203.0.113.10/32"]
-  ip_rules = var.ip_rules
 }
 
 # Queues (optional)
@@ -41,7 +47,7 @@ resource "azurerm_servicebus_topic" "t" {
   namespace_id = azurerm_servicebus_namespace.ns.id
 }
 
-# Diagnostics (use metric{} so it works across provider versions)
+# Diagnostics
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-sb"
