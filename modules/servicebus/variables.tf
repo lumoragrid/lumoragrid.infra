@@ -31,12 +31,12 @@ variable "sb_tier" {
 
 variable "capacity" {
   type        = number
-  default     = 1
-  description = "Messaging units for Premium only (ignored for Basic/Standard)."
+  default     = 0
+  description = "Messaging units for Premium only; ignored for Basic/Standard."
   validation {
-    # Can only refer to var.capacity here
-    condition     = var.capacity >= 1
-    error_message = "capacity must be >= 1 (used only when sb_tier is Premium)."
+    # 0 is fine for non-Premium; Premium is enforced by a precondition in main.tf
+    condition     = var.capacity == 0 || var.capacity >= 1
+    error_message = "capacity must be 0 (when not Premium) or >= 1 (for Premium)."
   }
 }
 
