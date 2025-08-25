@@ -11,18 +11,12 @@ resource "azurerm_servicebus_namespace" "ns" {
   minimum_tls_version           = "1.2"
   tags                          = var.tags
 
-  # Inline network rules (replaces azurerm_servicebus_namespace_network_rule_set)
   network_rule_set {
-    # If you specify any ip_rules or network_rules, default_action must be "Deny"
-    default_action = (length(var.ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+    # If any rules are present, default must be Deny
+    default_action           = (length(var.ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+    ip_rules                 = var.ip_rules
+    trusted_services_allowed = try(var.trusted_services_enabled, false)
 
-    # Flat list of IP/CIDR strings, e.g. ["203.0.113.10/32"]
-    ip_rules = var.ip_rules
-
-    # Allow Microsoft trusted services to bypass rules (optional)
-    trusted_service_access_enabled = try(var.trusted_services_enabled, false)
-
-    # Optional VNet subnet rules
     dynamic "network_rules" {
       for_each = try(var.subnet_ids, [])
       content {
@@ -30,12 +24,13 @@ resource "azurerm_servicebus_namespace" "ns" {
         ignore_missing_vnet_service_endpoint = false
       }
     }
+  }
 
-    lifecycle {
-      precondition {
-          condition     = var.sb_tier != "Premium" || var.capacity >= 1
-          error_message = "When sb_tier is Premium, capacity must be >= 1."
-      }
+  # put lifecycle at the RESOURCE root (not inside network_rule_set)
+  lifecycle {
+    precondition {
+      condition     = var.sb_tier != "Premium" || var.capacity >= 1
+      error_message = "When sb_tier is Premium, capacity must be >= 1."
     }
   }
 }
