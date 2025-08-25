@@ -156,6 +156,8 @@ stages:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+            fetchDepth: 0
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
@@ -169,7 +171,7 @@ stages:
               azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
               scriptType: bash
               scriptLocation: inlineScript
-              workingDirectory: envs/test
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/test'
               inlineScript: |
                 set -e
                 terraform init -reconfigure -upgrade \
@@ -201,6 +203,8 @@ stages:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+            fetchDepth: 0
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
@@ -214,7 +218,7 @@ stages:
               azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
               scriptType: bash
               scriptLocation: inlineScript
-              workingDirectory: envs/uat
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/uat'
               inlineScript: |
                 set -e
                 terraform init -reconfigure -upgrade \
@@ -246,6 +250,8 @@ stages:
       runOnce:
         deploy:
           steps:
+          - checkout: self
+            fetchDepth: 0
           - script: |
               set -e
               curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
@@ -259,7 +265,7 @@ stages:
               azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
               scriptType: bash
               scriptLocation: inlineScript
-              workingDirectory: envs/prod
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/prod'
               inlineScript: |
                 set -e
                 terraform init -reconfigure -upgrade \
