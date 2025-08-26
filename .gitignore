@@ -15,3 +15,4 @@
 /envs/dev/.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.1/windows_amd64
 /envs/dev/.terraform
 /.vs/lumoragrid.infra/v17/DocumentLayout.backup.json
+/.vs
