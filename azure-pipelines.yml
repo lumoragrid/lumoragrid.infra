@@ -52,8 +52,9 @@ parameters:
 - name: target_region
   displayName: "Target Region (optional, e.g., australiasoutheast)"
   type: string
-  default: ""
+  default: all
   values:
+  - all
   - eastus
   - eastus2
   - southcentralus
@@ -207,7 +208,7 @@ stages:
 
           terraform validate
 
-          if [ -n "${{ parameters.target_region }}" ]; then
+          if [ -n "${{ parameters.target_region }}" != "all" ]; then
             echo "Restricting to region: ${{ parameters.target_region }}"
             terraform plan -out=tfplan \
               -var "project=$(TF_PROJECT)" \
@@ -339,7 +340,7 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" ]; then
+                if [ -n "${{ parameters.target_region }}" != "all" ]; then
                   echo "Restricting to region: ${{ parameters.target_region }}"
                   terraform plan -out=tfplan \
                     -var "project=$(TF_PROJECT)" \
@@ -436,7 +437,7 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" ]; then
+                if [ -n "${{ parameters.target_region }}" != "all" ]; then
                   echo "Restricting to region: ${{ parameters.target_region }}"
                   terraform plan -out=tfplan \
                     -var "project=$(TF_PROJECT)" \
@@ -533,7 +534,7 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" ]; then
+                if [ -n "${{ parameters.target_region }}" != "all" ]; then
                   echo "Restricting to region: ${{ parameters.target_region }}"
                   terraform plan -out=tfplan \
                     -var "project=$(TF_PROJECT)" \
