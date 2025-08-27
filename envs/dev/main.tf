@@ -153,7 +153,7 @@ module "network" {
 
   name     = local.vnet_names[each.key]
   location = each.key
-  rg_name  = module.resource_groups[each.key].name
+  resource_group_name  = module.resource_groups[each.key].name
 
   # module expects list(string) for address_space and map(string) for subnets
   address_space = [local.regions_by_location[each.key].address_space]
@@ -196,7 +196,7 @@ module "storage" {
 
   account_name        = local.storage_account_names[each.key]
   location            = each.key
-  rg_name             = module.resource_groups[each.key].name
+  resource_group_name = module.resource_groups[each.key].name
 
   account_kind        = var.storage.account_kind
   replication_type    = var.storage.replication_type
@@ -227,7 +227,7 @@ module "servicebus" {
 
   name     = local.servicebus_namespace_names[each.key]
   location = each.key
-  rg_name  = module.resource_groups[each.key].name
+  resource_group_name  = module.resource_groups[each.key].name
 
   # Sizing & SKU
   sb_tier  = var.servicebus_sku
@@ -290,7 +290,7 @@ module "cosmos" {
   # Account & placement (primary only here)
   name     = local.cosmos_account_name
   location = local.primary_region
-  rg_name  = module.resource_groups[local.primary_region].name
+  resource_group_name  = module.resource_groups[local.primary_region].name
 
   # Account mode/cost controls
   cosmos_serverless = var.cosmos_serverless
@@ -325,7 +325,7 @@ module "sql" {
   server_name = lower(replace(local.sql_server_name, "_", "-"))
   db_name     = local.sql_db_name
   location    = local.primary_region
-  rg_name     = module.resource_groups[local.primary_region].name
+  resource_group_name     = module.resource_groups[local.primary_region].name
 
   administrator_login          = var.sql_admin_login
   administrator_login_password = var.sql_admin_password
