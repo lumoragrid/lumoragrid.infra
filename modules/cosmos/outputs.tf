@@ -15,12 +15,6 @@ output "endpoint" {
   value       = azurerm_cosmosdb_account.acct.endpoint
 }
 
-output "primary_master_key" {
-  description = "Primary master key for the Cosmos DB account."
-  value       = azurerm_cosmosdb_account.acct.primary_master_key
-  sensitive   = true
-}
-
 output "connection_strings" {
   description = "List of connection strings for the Cosmos DB account."
   value       = azurerm_cosmosdb_account.acct.connection_strings

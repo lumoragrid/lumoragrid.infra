@@ -13,7 +13,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  sb_tier      = var.sb_tier
+  sku      = var.sb_tier
   capacity = var.sb_tier == "Premium" ? var.capacity : null
 
   # Keep PNA enabled unless you explicitly disable it in variables (optional var with default = true)
@@ -26,8 +26,16 @@ resource "azurerm_servicebus_namespace" "ns" {
   network_rule_set {
     # If any rules are present, default must be Deny
     default_action           = length(var.ip_allowlist) > 0 ? "Deny" : "Allow"
-    ip_allowlist             = var.ip_allowlist
+    ip_rules                 = var.ip_allowlist
     trusted_services_allowed = try(var.trusted_services_enabled, false)
+
+    dynamic "network_rules" {
+      for_each = try(var.subnet_ids, [])
+      content {
+        subnet_id                            = network_rules.value
+        ignore_missing_vnet_service_endpoint = false
+      }
+    }
   }
 
   lifecycle {
