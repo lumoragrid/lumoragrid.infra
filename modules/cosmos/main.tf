@@ -1,29 +1,45 @@
 # modules/cosmos/main.tf
+# Updated to align with env main.tf inputs:
+# - resource_group_name
+# - consistency_level, serverless, free_tier
+# - enable_multi_region, read_regions, automatic_failover
+# - diagnostics & private endpoints
 
 resource "azurerm_cosmosdb_account" "acct" {
   name                = var.name
   location            = var.location
-  resource_group_name = var.rg_name
+  resource_group_name = var.resource_group_name
 
   offer_type = "Standard"
   kind       = "GlobalDocumentDB"
 
-  automatic_failover_enabled    = var.automatic_failover_enabled
-  free_tier_enabled             = var.enable_free_tier
-  public_network_access_enabled = var.public_network_access_enabled
+  automatic_failover_enabled    = var.enable_automatic_failover
+  free_tier_enabled             = var.free_tier
+  public_network_access_enabled = try(var.public_network_access_enabled, true)
 
+  # Primary region
   geo_location {
     location          = var.location
     failover_priority = 0
     zone_redundant    = false
   }
 
+  # Read replicas (if enabled)
+  dynamic "geo_location" {
+    for_each = var.enable_multi_region ? toset(var.read_regions) : []
+    content {
+      location          = geo_location.value
+      failover_priority = 1
+      zone_redundant    = false
+    }
+  }
+
   consistency_policy {
-    consistency_level = "Session"
+    consistency_level = var.consistency_level
   }
 
   dynamic "capabilities" {
-    for_each = var.cosmos_serverless ? [1] : []
+    for_each = var.serverless ? [1] : []
     content {
       name = "EnableServerless"
     }
@@ -32,7 +48,7 @@ resource "azurerm_cosmosdb_account" "acct" {
   tags = var.tags
 }
 
-# Diagnostics (new syntax avoids the 'metric' deprecation warning)
+# Diagnostics
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-cosmos"
@@ -43,6 +59,13 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
     category = "AllMetrics"
     enabled  = true
   }
+
+  lifecycle {
+    precondition {
+      condition     = var.la_workspace_id != null && length(var.la_workspace_id) > 0
+      error_message = "la_workspace_id must be provided when enable_diagnostics = true."
+    }
+  }
 }
 
 # Private Endpoint (SQL API)
@@ -50,7 +73,7 @@ resource "azurerm_private_endpoint" "pe" {
   count               = var.enable_private_endpoints ? 1 : 0
   name                = "${var.name}-pe"
   location            = var.location
-  resource_group_name = var.rg_name
+  resource_group_name = var.resource_group_name
   subnet_id           = var.pe_subnet_id
 
   private_service_connection {
@@ -61,7 +84,7 @@ resource "azurerm_private_endpoint" "pe" {
   }
 
   dynamic "private_dns_zone_group" {
-    for_each = length(var.private_dns_zone_ids) > 0 ? [1] : []
+    for_each = length(try(var.private_dns_zone_ids, [])) > 0 ? [1] : []
     content {
       name                 = "cosmos-dns"
       private_dns_zone_ids = var.private_dns_zone_ids
@@ -73,10 +96,5 @@ resource "azurerm_private_endpoint" "pe" {
       condition     = var.enable_private_endpoints == false || var.pe_subnet_id != null
       error_message = "When enable_private_endpoints = true, pe_subnet_id must be provided."
     }
-    # Optional: enforce DNS zones when PE is enabled
-    # precondition {
-    #   condition     = var.enable_private_endpoints == false || length(var.private_dns_zone_ids) > 0
-    #   error_message = "When enable_private_endpoints = true, private_dns_zone_ids must contain at least one zone."
-    # }
   }
 }

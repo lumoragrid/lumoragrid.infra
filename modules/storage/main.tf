@@ -1,13 +1,20 @@
+# modules/storage/main.tf
+# Updated for consistency, security, and alignment with envs/*/main.tf
+
 resource "azurerm_storage_account" "sa" {
-  name                            = var.account_name
-  resource_group_name             = var.rg_name
-  location                        = var.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  min_tls_version                 = "TLS1_2"
+  name                     = var.name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_tier             = var.account_tier
+  account_replication_type = var.replication_type
+  account_kind             = var.account_kind
+
+  min_tls_version               = "TLS1_2"
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = var.public_network_access_enabled
-  tags                            = var.tags
+  enable_https_traffic_only     = true
+  public_network_access_enabled = try(var.public_network_access_enabled, true)
+
+  tags = var.tags
 
   blob_properties {
     versioning_enabled = var.enable_versioning
@@ -20,7 +27,7 @@ resource "azurerm_storage_account" "sa" {
   }
 }
 
-# Diagnostics (metrics only for portability)
+# Diagnostics
 resource "azurerm_monitor_diagnostic_setting" "diag" {
   count                      = var.enable_diagnostics ? 1 : 0
   name                       = "diag-storage"
@@ -31,14 +38,21 @@ resource "azurerm_monitor_diagnostic_setting" "diag" {
     category = "AllMetrics"
     enabled  = true
   }
+
+  lifecycle {
+    precondition {
+      condition     = var.la_workspace_id != null && length(var.la_workspace_id) > 0
+      error_message = "la_workspace_id must be provided when enable_diagnostics = true."
+    }
+  }
 }
 
 # Private Endpoint (blob subresource)
 resource "azurerm_private_endpoint" "pe" {
   count               = var.enable_private_endpoints ? 1 : 0
-  name                = "${var.account_name}-pe-blob"
+  name                = "${var.name}-pe-blob"
   location            = var.location
-  resource_group_name = var.rg_name
+  resource_group_name = var.resource_group_name
   subnet_id           = var.pe_subnet_id
 
   private_service_connection {
@@ -49,7 +63,7 @@ resource "azurerm_private_endpoint" "pe" {
   }
 
   dynamic "private_dns_zone_group" {
-    for_each = length(var.private_dns_zone_ids) > 0 ? [1] : []
+    for_each = length(try(var.private_dns_zone_ids, [])) > 0 ? [1] : []
     content {
       name                 = "blob-dns"
       private_dns_zone_ids = var.private_dns_zone_ids
