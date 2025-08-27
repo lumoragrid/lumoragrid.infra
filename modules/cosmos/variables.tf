@@ -102,9 +102,3 @@ variable "consistency_level" {
     error_message = "consistency_level must be one of: Strong, BoundedStaleness, Session, ConsistentPrefix, Eventual."
   }
 }
-
-variable "automatic_failover_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable automatic failover among regions."
-}
