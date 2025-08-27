@@ -230,8 +230,7 @@ module "servicebus" {
 
   # Network & security
   public_network_access_enabled = var.enable_private_endpoints ? false : true
-  ip_rules                      = var.ip_allowlist
-  subnet_ids                    = [] # allow additional subnets if required later
+  ip_allowlist                      = var.ip_allowlist
   trusted_services_enabled      = true
 
   # Diagnostics

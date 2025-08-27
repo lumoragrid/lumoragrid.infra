@@ -26,7 +26,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   network_rule_set {
     # If any rules are present, default must be Deny
     default_action           = length(var.ip_allowlist) > 0 ? "Deny" : "Allow"
-    ip_allowlist                 = var.ip_allowlist
+    ip_allowlist             = var.ip_allowlist
     trusted_services_allowed = try(var.trusted_services_enabled, false)
   }
 
