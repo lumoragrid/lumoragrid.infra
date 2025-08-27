@@ -53,6 +53,53 @@ parameters:
   displayName: "Target Region (optional, e.g., australiasoutheast)"
   type: string
   default: ""
+  values:
+  - ""                   # blank = all regions
+  - eastus
+  - eastus2
+  - southcentralus
+  - westus2
+  - westus3
+  - australiaeast
+  - australiasoutheast
+  - australiacentral
+  - australiacentral2
+  - eastasia
+  - southeastasia
+  - northeurope
+  - westeurope
+  - swedencentral
+  - uksouth
+  - ukwest
+  - centralus
+  - westus
+  - southafricanorth
+  - southafricawest
+  - centralindia
+  - southindia
+  - westindia
+  - japaneast
+  - japanwest
+  - koreacentral
+  - koreasouth
+  - canadacentral
+  - canadaeast
+  - francecentral
+  - francesouth
+  - germanywestcentral
+  - germanynorth
+  - italynorth
+  - norwayeast
+  - norwaywest
+  - polandcentral
+  - switzerlandnorth
+  - switzerlandwest
+  - uaenorth
+  - uaecentral
+  - brazilsouth
+  - brazilsoutheast
+  - israelcentral
+  - qatarcentral
 
 stages:
 # ---------- BOOTSTRAP (idempotent): state + provider registration ----------
