@@ -80,3 +80,31 @@ variable "private_dns_zone_ids" {
   default     = []
   description = "Private DNS zone IDs to link when creating a Private Endpoint."
 }
+
+variable "enable_multi_region" {
+  type        = bool
+  default     = false
+  description = "If true, create read replicas in additional regions."
+}
+
+variable "read_regions" {
+  type        = list(string)
+  default     = []
+  description = "Additional regions (locations) for read replicas; primary is var.location."
+}
+
+variable "consistency_level" {
+  type        = string
+  default     = "Session"
+  description = "Strong | BoundedStaleness | Session | ConsistentPrefix | Eventual"
+  validation {
+    condition     = contains(["Strong","BoundedStaleness","Session","ConsistentPrefix","Eventual"], var.consistency_level)
+    error_message = "consistency_level must be one of: Strong, BoundedStaleness, Session, ConsistentPrefix, Eventual."
+  }
+}
+
+variable "automatic_failover_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable automatic failover among regions."
+}

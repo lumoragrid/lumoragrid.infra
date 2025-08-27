@@ -32,7 +32,7 @@ resource "azurerm_servicebus_namespace" "ns" {
 
   lifecycle {
     precondition {
-      condition     = var.sku != "Premium" || var.capacity >= 1
+      condition     = var.sb_tier != "Premium" || var.capacity >= 1
       error_message = "When sku is Premium, capacity must be >= 1."
     }
   }

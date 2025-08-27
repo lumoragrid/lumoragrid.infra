@@ -144,3 +144,17 @@ variable "sql_admin_password" {
   description = "SQL administrator password (provided via Key Vault/Variable Group)"
   sensitive   = true
 }
+
+# Storage defaults (used by modules/storage)
+variable "storage" {
+  type = object({
+    account_kind     = string
+    replication_type = string
+  })
+  description = "Default Storage Account settings for this environment."
+  default = {
+    account_kind     = "StorageV2"
+    replication_type = "ZRS"
+  }
+}
+

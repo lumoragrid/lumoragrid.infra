@@ -13,9 +13,10 @@ resource "azurerm_cosmosdb_account" "acct" {
   offer_type = "Standard"
   kind       = "GlobalDocumentDB"
 
-  automatic_failover_enabled    = var.enable_automatic_failover
-  free_tier_enabled             = var.free_tier
-  public_network_access_enabled = try(var.public_network_access_enabled, true)
+  automatic_failover_enabled    = var.automatic_failover_enabled
+  free_tier_enabled             = var.enable_free_tier
+  public_network_access_enabled = var.public_network_access_enabled
+
 
   # Primary region
   geo_location {
@@ -26,10 +27,10 @@ resource "azurerm_cosmosdb_account" "acct" {
 
   # Read replicas (if enabled)
   dynamic "geo_location" {
-    for_each = var.enable_multi_region ? toset(var.read_regions) : []
+    for_each = var.enable_multi_region ? { for i, r in var.read_regions : r => i + 1 } : {}
     content {
-      location          = geo_location.value
-      failover_priority = 1
+      location          = geo_location.key
+      failover_priority = geo_location.value
       zone_redundant    = false
     }
   }
