@@ -260,11 +260,11 @@ module "keyvault" {
     if try(local.regions_by_location[loc].enable_keyvault, true)
   }
 
-  name       = local.key_vault_names[each.key]
-  location   = each.key
-  rg_name    = local.resource_group_names[each.key]
-  tenant_id  = var.tenant_id
-  tags       = local.tags
+  name                 = local.key_vault_names[each.key]
+  location             = each.key
+  resource_group_name  = local.resource_group_names[each.key]  # <-- updated
+  tenant_id            = var.tenant_id
+  tags                 = local.tags
 
   public_network_access_enabled = var.enable_private_endpoints ? false : true
   enable_purge_protection       = true
