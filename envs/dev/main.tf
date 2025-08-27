@@ -100,7 +100,7 @@ locals {
 #############################################
 
 module "resource_groups" {
-  source = "../../modules/resource_group"
+  source = "../../modules/resource-group"
 
   for_each = toset(local.region_locations)
 
@@ -114,7 +114,7 @@ module "resource_groups" {
 #############################################
 
 module "log_analytics" {
-  source = "../../modules/log_analytics"
+  source = "../../modules/monitor"
 
   for_each = toset(local.region_locations)
 
@@ -153,7 +153,7 @@ module "servicebus" {
 
   # Diagnostics
   enable_diagnostics = var.enable_diagnostics
-  la_workspace_id    = module.log_analytics[each.key].id
+  la_workspace_id    = module.monitor[each.key].id
 
   # Namespace-level options (safe defaults)
   duplicate_detection_enabled = true
@@ -189,7 +189,7 @@ module "cosmos" {
   # Network & diagnostics
   enable_private_endpoints   = var.enable_private_endpoints
   enable_diagnostics         = var.enable_diagnostics
-  la_workspace_id            = module.log_analytics[local.primary_region].id
+  la_workspace_id            = module.monitor[local.primary_region].id
 
   tags = local.tags
 }

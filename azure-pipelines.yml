@@ -52,7 +52,7 @@ parameters:
 - name: target_region
   displayName: "Target Region (optional, e.g., australiasoutheast)"
   type: string
-  default: all
+  default: australiasoutheast
   values:
   - all
   - eastus
