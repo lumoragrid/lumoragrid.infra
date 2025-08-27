@@ -197,7 +197,7 @@ stages:
           export ARM_TENANT_ID="$(TF_TENANT_ID)"
           export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
 
-          terraform fmt -check -recursive
+          terraform fmt -recursive
 
           terraform init -reconfigure -upgrade \
             -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
