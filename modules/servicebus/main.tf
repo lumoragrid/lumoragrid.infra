@@ -13,8 +13,8 @@ resource "azurerm_servicebus_namespace" "ns" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  sb_tier      = var.sku
-  capacity = var.sku == "Premium" ? var.capacity : null
+  sb_tier      = var.sb_tier
+  capacity = var.sb_tier == "Premium" ? var.capacity : null
 
   # Keep PNA enabled unless you explicitly disable it in variables (optional var with default = true)
   public_network_access_enabled = try(var.public_network_access_enabled, true)
