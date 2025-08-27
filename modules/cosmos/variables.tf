@@ -11,7 +11,7 @@ variable "location" {
   description = "Primary Azure region for the Cosmos DB account."
 }
 
-variable "rg_name" {
+variable "resource_group_name" {
   type        = string
   description = "Resource group name where the Cosmos DB account resides."
 }
