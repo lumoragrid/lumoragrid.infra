@@ -54,7 +54,6 @@ parameters:
   type: string
   default: ""
   values:
-  - ""                   # blank = all regions
   - eastus
   - eastus2
   - southcentralus
