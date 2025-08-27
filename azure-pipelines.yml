@@ -1,5 +1,7 @@
 # LumoraGrid Terraform – Azure DevOps (bootstrap + dev→test→uat→prod)
-# Now supports selective region deploys via target_region parameter
+# Updated to support selective region deploys via `target_region` parameter.
+# If `target_region` is empty => deploy all regions from TF_REGIONS_JSON.
+# If `target_region` is set (e.g., australiasoutheast) => deploy ONLY that region.
 
 trigger:
   branches:
@@ -26,7 +28,10 @@ pr:
 # Variables from Variable Groups
 # ------------------------------
 variables:
+# Shared (backend, tenant, tags, law_sku, etc.)
 - group: LumoraGrid.Common
+
+# Per-environment groups (choose at compile time for each stage)
 - name: DEV_GROUP
   value: LumoraGrid.Dev
 - name: TEST_GROUP
@@ -35,9 +40,14 @@ variables:
   value: LumoraGrid.Uat
 - name: PROD_GROUP
   value: LumoraGrid.Prod
+
+# Tooling
 - name: TF_VERSION
   value: '1.7.5'
 
+# ------------------------------
+# Parameters
+# ------------------------------
 parameters:
 - name: target_region
   displayName: "Target Region (optional, e.g., australiasoutheast)"
@@ -45,11 +55,12 @@ parameters:
   default: ""
 
 stages:
-# ---------- BOOTSTRAP ----------
+# ---------- BOOTSTRAP (idempotent): state + provider registration ----------
 - stage: bootstrap
   displayName: Bootstrap (tfstate + providers)
   jobs:
   - job: bootstrap_job
+    displayName: Ensure tfstate + register providers
     pool:
       vmImage: ubuntu-latest
     steps:
@@ -73,13 +84,24 @@ stages:
           SA="$(TF_BACKEND_SA)"
           CN="$(TF_BACKEND_CONTAINER)"
           LOC="${TFSTATE_LOCATION:-australiaeast}"
+
+          echo "Ensuring RG=$RG in $LOC"
           az group show -n "$RG" >/dev/null 2>&1 || az group create -n "$RG" -l "$LOC"
+
           if ! az storage account show -g "$RG" -n "$SA" >/dev/null 2>&1; then
+            echo "Creating Storage Account $SA..."
             az storage account create -n "$SA" -g "$RG" -l "$LOC" \
               --sku Standard_LRS --kind StorageV2 --min-tls-version TLS1_2
+            az storage account blob-service-properties update \
+              --account-name "$SA" \
+              --enable-versioning true \
+              --enable-delete-retention true --delete-retention-days 7 \
+              --enable-container-delete-retention true --container-delete-retention-days 7
           fi
+
           ACCOUNT_KEY=$(az storage account keys list -g "$RG" -n "$SA" --query [0].value -o tsv)
           az storage container create --name "$CN" --account-name "$SA" --account-key "$ACCOUNT_KEY" >/dev/null || true
+          echo "tfstate ready: rg=$RG sa=$SA container=$CN"
 
     - task: AzureCLI@2
       displayName: Register resource providers
@@ -88,9 +110,11 @@ stages:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
+          set -e
           for p in Microsoft.Storage Microsoft.KeyVault Microsoft.DocumentDB Microsoft.ServiceBus Microsoft.Sql Microsoft.Insights Microsoft.Network; do
             az provider register --namespace $p --wait
           done
+          echo "Providers registered."
 
 # ---------- DEV ----------
 - stage: dev
@@ -100,6 +124,7 @@ stages:
   - group: $(DEV_GROUP)
   jobs:
   - job: tf_dev
+    displayName: Terraform DEV
     pool:
       vmImage: ubuntu-latest
     steps:
@@ -119,10 +144,13 @@ stages:
         workingDirectory: envs/dev
         inlineScript: |
           set -euo pipefail
+
           export ARM_CLIENT_ID="$(ARM_CLIENT_ID)"
           export ARM_CLIENT_SECRET="$(ARM_CLIENT_SECRET)"
           export ARM_TENANT_ID="$(TF_TENANT_ID)"
           export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
+
+          terraform fmt -check -recursive
 
           terraform init -reconfigure -upgrade \
             -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
@@ -134,13 +162,13 @@ stages:
           terraform validate
 
           if [ -n "${{ parameters.target_region }}" ]; then
-            echo "Restricting to region ${{ parameters.target_region }}"
+            echo "Restricting to region: ${{ parameters.target_region }}"
             terraform plan -out=tfplan \
               -var "project=$(TF_PROJECT)" \
               -var "environment=$(TF_ENVIRONMENT)" \
               -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
               -var "tenant_id=$(TF_TENANT_ID)" \
-              -var "regions={${{ parameters.target_region }} = jsondecode($(TF_REGIONS_JSON))[\"${{ parameters.target_region }}\"]}" \
+              -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
               -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
               -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
               -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
@@ -176,6 +204,18 @@ stages:
               -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
           fi
 
+          terraform show -no-color tfplan > plan.txt
+      env:
+        ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+
+    - task: PublishPipelineArtifact@1
+      displayName: Publish plan (dev)
+      inputs:
+        targetPath: "$(System.DefaultWorkingDirectory)/envs/dev"
+        artifact: "tf-dev"
+        publishLocation: "pipeline"
+
     - task: AzureCLI@2
       displayName: Apply (dev – only on main)
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
@@ -186,4 +226,311 @@ stages:
         workingDirectory: envs/dev
         inlineScript: |
           set -euo pipefail
+          export ARM_CLIENT_ID="$(ARM_CLIENT_ID)"
+          export ARM_CLIENT_SECRET="$(ARM_CLIENT_SECRET)"
+          export ARM_TENANT_ID="$(TF_TENANT_ID)"
+          export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
+
+          terraform init -reconfigure \
+            -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
+            -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
+            -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
+            -backend-config="key=$(TF_BACKEND_KEY)" \
+            -backend-config="subscription_id=$(TF_SUBSCRIPTION_ID)"
+
+          terraform validate
           terraform apply -auto-approve tfplan
+      env:
+        ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+        ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+
+# ---------- TEST ----------
+- stage: test
+  displayName: TEST (plan/apply)
+  dependsOn: dev
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+  - group: $(TEST_GROUP)
+  jobs:
+  - deployment: tf_test
+    displayName: Terraform TEST
+    environment: 'test'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              set -e
+              curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
+              sudo unzip -o tf.zip -d /usr/local/bin
+              terraform -version
+            displayName: Install Terraform
+
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (test)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/test'
+              inlineScript: |
+                set -euo pipefail
+
+                export ARM_CLIENT_ID="$(ARM_CLIENT_ID)"
+                export ARM_CLIENT_SECRET="$(ARM_CLIENT_SECRET)"
+                export ARM_TENANT_ID="$(TF_TENANT_ID)"
+                export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
+
+                terraform init -reconfigure -upgrade \
+                  -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
+                  -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
+                  -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
+                  -backend-config="key=$(TF_BACKEND_KEY)" \
+                  -backend-config="subscription_id=$(TF_SUBSCRIPTION_ID)"
+
+                terraform validate
+
+                if [ -n "${{ parameters.target_region }}" ]; then
+                  echo "Restricting to region: ${{ parameters.target_region }}"
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                else
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var 'regions=$(TF_REGIONS_JSON)' \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                fi
+
+                terraform apply -auto-approve tfplan
+            env:
+              ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+
+# ---------- UAT ----------
+- stage: uat
+  displayName: UAT (plan/apply)
+  dependsOn: test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+  - group: $(UAT_GROUP)
+  jobs:
+  - deployment: tf_uat
+    displayName: Terraform UAT
+    environment: 'uat'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              set -e
+              curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
+              sudo unzip -o tf.zip -d /usr/local/bin
+              terraform -version
+            displayName: Install Terraform
+
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (uat)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/uat'
+              inlineScript: |
+                set -euo pipefail
+
+                export ARM_CLIENT_ID="$(ARM_CLIENT_ID)"
+                export ARM_CLIENT_SECRET="$(ARM_CLIENT_SECRET)"
+                export ARM_TENANT_ID="$(TF_TENANT_ID)"
+                export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
+
+                terraform init -reconfigure -upgrade \
+                  -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
+                  -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
+                  -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
+                  -backend-config="key=$(TF_BACKEND_KEY)" \
+                  -backend-config="subscription_id=$(TF_SUBSCRIPTION_ID)"
+
+                terraform validate
+
+                if [ -n "${{ parameters.target_region }}" ]; then
+                  echo "Restricting to region: ${{ parameters.target_region }}"
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                else
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var 'regions=$(TF_REGIONS_JSON)' \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                fi
+
+                terraform apply -auto-approve tfplan
+            env:
+              ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
+
+# ---------- PROD ----------
+- stage: prod
+  displayName: PROD (plan/apply)
+  dependsOn: uat
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  variables:
+  - group: $(PROD_GROUP)
+  jobs:
+  - deployment: tf_prod
+    displayName: Terraform PROD
+    environment: 'prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            fetchDepth: 0
+
+          - script: |
+              set -e
+              curl -fsSL https://releases.hashicorp.com/terraform/$(TF_VERSION)/terraform_$(TF_VERSION)_linux_amd64.zip -o tf.zip
+              sudo unzip -o tf.zip -d /usr/local/bin
+              terraform -version
+            displayName: Install Terraform
+
+          - task: AzureCLI@2
+            displayName: Init + Plan + Apply (prod)
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: '$(System.DefaultWorkingDirectory)/envs/prod'
+              inlineScript: |
+                set -euo pipefail
+
+                export ARM_CLIENT_ID="$(ARM_CLIENT_ID)"
+                export ARM_CLIENT_SECRET="$(ARM_CLIENT_SECRET)"
+                export ARM_TENANT_ID="$(TF_TENANT_ID)"
+                export ARM_SUBSCRIPTION_ID="$(TF_SUBSCRIPTION_ID)"
+
+                terraform init -reconfigure -upgrade \
+                  -backend-config="resource_group_name=$(TF_BACKEND_RG)" \
+                  -backend-config="storage_account_name=$(TF_BACKEND_SA)" \
+                  -backend-config="container_name=$(TF_BACKEND_CONTAINER)" \
+                  -backend-config="key=$(TF_BACKEND_KEY)" \
+                  -backend-config="subscription_id=$(TF_SUBSCRIPTION_ID)"
+
+                terraform validate
+
+                if [ -n "${{ parameters.target_region }}" ]; then
+                  echo "Restricting to region: ${{ parameters.target_region }}"
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                else
+                  terraform plan -out=tfplan \
+                    -var "project=$(TF_PROJECT)" \
+                    -var "environment=$(TF_ENVIRONMENT)" \
+                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                    -var "tenant_id=$(TF_TENANT_ID)" \
+                    -var 'regions=$(TF_REGIONS_JSON)' \
+                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                    -var "law_sku=$(TF_LAW_SKU)" \
+                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                    -var 'tags=$(TF_TAGS_JSON)' \
+                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
+                fi
+
+                terraform apply -auto-approve tfplan
+            env:
+              ARM_CLIENT_ID:        $(ARM_CLIENT_ID)
+              ARM_CLIENT_SECRET:    $(ARM_CLIENT_SECRET)
