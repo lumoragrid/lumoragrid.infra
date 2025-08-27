@@ -1,3 +1,6 @@
+# modules/servicebus/variables.tf
+# Updated to align with module inputs used by envs/*/main.tf
+
 variable "name" {
   type        = string
   description = "Service Bus namespace name."
@@ -8,7 +11,7 @@ variable "location" {
   description = "Azure region."
 }
 
-variable "rg_name" {
+variable "resource_group_name" {
   type        = string
   description = "Resource group name."
 }
@@ -19,13 +22,14 @@ variable "tags" {
   description = "Common resource tags."
 }
 
-variable "sb_tier" {
+# SKU / Capacity
+variable "sku" {
   type        = string
   default     = "Standard" # Allowed: Basic, Standard, Premium
   description = "Service Bus SKU."
   validation {
-    condition     = contains(["Basic", "Standard", "Premium"], var.sb_tier)
-    error_message = "sb_tier must be one of: Basic, Standard, Premium."
+    condition     = contains(["Basic", "Standard", "Premium"], var.sku)
+    error_message = "sku must be one of: Basic, Standard, Premium."
   }
 }
 
@@ -46,17 +50,11 @@ variable "public_network_access_enabled" {
   description = "Whether public network access is enabled on the namespace."
 }
 
-# Network rules (IP + optional subnets)
-variable "ip_rules" {
+# Network ACLs (IP allowlist)
+variable "ip_allowlist" {
   type        = list(string)
   default     = []
   description = "List of IP/CIDR strings allowed (e.g., [\"203.0.113.10/32\"])."
-}
-
-variable "subnet_ids" {
-  type        = list(string)
-  default     = []
-  description = "Optional list of subnet IDs to allow via network rules."
 }
 
 variable "trusted_services_enabled" {
@@ -89,6 +87,19 @@ variable "topics" {
   type        = list(string)
   default     = []
   description = "Topic names to create."
+}
+
+# Queue behavior
+variable "duplicate_detection_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable duplicate detection for queues."
+}
+
+variable "duplicate_detection_time_window" {
+  type        = string
+  default     = null
+  description = "ISO 8601 duration (e.g., PT10M) for duplicate detection history window."
 }
 
 # Private endpoints

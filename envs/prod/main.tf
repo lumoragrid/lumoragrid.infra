@@ -1,13 +1,14 @@
 terraform {
   required_version = ">= 1.6.0"
+
   required_providers {
     azurerm = {
-      source  = "hashicorp/azurerm",
-      version = ">= 3.107.0"
+      source  = "hashicorp/azurerm"
+      version = "~> 3.116"
     }
     random = {
-      source  = "hashicorp/random",
-      version = ">= 3.6.0"
+      source  = "hashicorp/random"
+      version = "~> 3.6"
     }
   }
 }
@@ -16,187 +17,180 @@ provider "azurerm" {
   features {}
 }
 
-# Uncomment and configure when ready to move to remote state
-#terraform {
-#  backend "azurerm" {
-#    resource_group_name  = "STATE_RG"
-#    storage_account_name = "statestorageacct"
-#    container_name       = "tfstate"
-#    key                  = "lumoragrid-${var.env}.tfstate"
-#  }
-#}
+data "azurerm_client_config" "current" {}
 
-variable "env" { type = string }
-variable "location" { type = string }
-variable "prefix" { type = string }
-variable "tenant_id" { type = string }
-variable "ip_allowlist" {
-  type    = list(string)
-  default = []
-}
-
-variable "enable_private_endpoints" {
-  type    = bool
-  default = false
-}
-variable "enable_diagnostics" {
-  type    = bool
-  default = true
-}
-
-variable "sb_tier" {
-  type    = string
-  default = "Standard"
-}
-variable "sb_capacity" {
-  type    = number
-  default = 0
-}
-
-variable "cosmos_serverless" {
-  type    = bool
-  default = true
-}
-variable "cosmos_enable_free_tier" {
-  type    = bool
-  default = true
-}
-
-variable "sql_admin_login" {
-  type    = string
-  default = "sqladminuser"
-}
-variable "sql_admin_password" { type = string }
+#############################################
+# Locals: naming, regions, and common tags  #
+#############################################
 
 locals {
-  name_prefix = "${var.prefix}-${var.env}"
-  rg_name     = "rg-${var.prefix}-${var.env}-core"
-  vnet_name   = "vnet-${var.prefix}-${var.env}"
-  tags = {
-    app   = "lumoragrid"
-    env   = var.env
-    owner = "platform"
+  project          = var.project
+  environment      = var.environment
+  regions_map      = var.regions
+  region_locations = [for _, v in var.regions : v.location]
+  primary_region   = length(keys(var.regions)) > 0 ? var.regions[keys(var.regions)[0]].location : "australiaeast"
+
+  region_short = {
+    "australiaeast"       = "aue"
+    "australiasoutheast"  = "ase"
+    "australiacentral"    = "auc"
+    "eastasia"            = "eas"
+    "southeastasia"       = "sea"
+    "eastus"              = "eus"
+    "eastus2"             = "eu2"
+    "centralus"           = "cus"
+    "westus"              = "wus"
+    "westus2"             = "wu2"
+    "westus3"             = "wu3"
+    "uksouth"             = "uks"
+    "ukwest"              = "ukw"
+    "northeurope"         = "neu"
+    "westeurope"          = "weu"
+    "japaneast"           = "jpe"
+    "japanwest"           = "jpw"
+    "koreacentral"        = "kor"
+    "centralindia"        = "cin"
+    "southindia"          = "sin"
+    "westindia"           = "win"
   }
+
+  global_suffix = lower(replace("${local.project}${local.environment}", "-", ""))
+  prefix        = "${local.project}-${local.environment}"
+
+  tags = merge(
+    {
+      Project     = local.project
+      Environment = local.environment
+      ManagedBy   = "Terraform"
+    },
+    var.tags
+  )
+
+  resource_group_names = {
+    for loc in local.region_locations :
+    loc => "${local.prefix}-rg-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
+  }
+
+  log_analytics_names = {
+    for loc in local.region_locations :
+    loc => "${local.prefix}-law-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
+  }
+
+  servicebus_namespace_names = {
+    for loc in local.region_locations :
+    loc => "${local.prefix}-sb-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
+  }
+
+  cosmos_account_name = substr(lower(replace("${local.global_suffix}cosmos", "-", "")), 0, 44)
 }
 
-module "rg" {
-  source   = "../../modules/resource-group"
-  name     = local.rg_name
-  location = var.location
+#############################################
+# Per-Region Resource Groups                 #
+#############################################
+
+module "resource_groups" {
+  source = "../../modules/resource_group"
+
+  for_each = toset(local.region_locations)
+
+  name     = local.resource_group_names[each.key]
+  location = each.key
   tags     = local.tags
 }
 
-module "monitor" {
-  source         = "../../modules/monitor"
-  name_prefix    = local.name_prefix
-  location       = var.location
-  rg_name        = module.rg.name
-  retention_days = var.env == "prod" ? 30 : (var.env == "uat" ? 30 : 30)
-  tags           = local.tags
-}
+#############################################
+# Per-Region Log Analytics Workspaces        #
+#############################################
 
-module "network" {
-  source        = "../../modules/network"
-  name          = local.vnet_name
-  location      = var.location
-  rg_name       = module.rg.name
-  address_space = ["10.${var.env == "prod" ? 3 : var.env == "uat" ? 2 : var.env == "test" ? 1 : 0}.0.0/16"]
-  subnets = {
-    "apps" = "10.${var.env == "prod" ? 3 : var.env == "uat" ? 2 : var.env == "test" ? 1 : 0}.1.0/24"
-    "pe"   = "10.${var.env == "prod" ? 3 : var.env == "uat" ? 2 : var.env == "test" ? 1 : 0}.2.0/24"
-  }
+module "log_analytics" {
+  source = "../../modules/log_analytics"
+
+  for_each = toset(local.region_locations)
+
+  name                = local.log_analytics_names[each.key]
+  location            = each.key
+  resource_group_name = local.resource_group_names[each.key]
+
+  sku               = var.law_sku
+  retention_in_days = var.log_analytics_retention_days
+
   tags = local.tags
 }
 
-# Storage (blob)
-module "storage" {
-  source                        = "../../modules/storage"
-  account_name                  = lower(replace("${var.prefix}${var.env}", "-", ""))
-  location                      = var.location
-  rg_name                       = module.rg.name
-  enable_diagnostics            = var.enable_diagnostics
-  la_workspace_id               = module.monitor.log_analytics_workspace_id
-  public_network_access_enabled = true
-  enable_private_endpoints      = var.enable_private_endpoints
-  pe_subnet_id                  = module.network.subnet_ids["pe"]
-  tags                          = local.tags
-}
+#############################################
+# Per-Region Service Bus Namespaces          #
+#############################################
 
-# Key Vault
-module "keyvault" {
-  source                        = "../../modules/keyvault"
-  name                          = "kv-${var.prefix}-${var.env}"
-  location                      = var.location
-  rg_name                       = module.rg.name
-  tenant_id                     = var.tenant_id
-  public_network_access_enabled = true
-  enable_purge_protection       = true
-  enable_diagnostics            = var.enable_diagnostics
-  la_workspace_id               = module.monitor.log_analytics_workspace_id
-  enable_private_endpoints      = var.enable_private_endpoints
-  pe_subnet_id                  = module.network.subnet_ids["pe"]
-  tags                          = local.tags
-}
-
-# Service Bus
 module "servicebus" {
-  source                        = "../../modules/servicebus"
-  name                          = "sb-${var.prefix}-${var.env}"
-  location                      = var.location
-  rg_name                       = module.rg.name
-  sb_tier                       = var.sb_tier
-  capacity                      = var.sb_capacity
-  public_network_access_enabled = true
-  ip_rules                      = var.ip_allowlist
-  enable_diagnostics            = var.enable_diagnostics
-  la_workspace_id               = module.monitor.log_analytics_workspace_id
-  enable_private_endpoints      = var.enable_private_endpoints
-  pe_subnet_id                  = module.network.subnet_ids["pe"]
+  source = "../../modules/servicebus"
 
-  # Seed entities (adjust to your needs)
-  queues = [
-    "ai-tailor-requests",
-    "application-tasks",
-    "submission-results"
-  ]
-  topics = [
-    "jobs-discovered",
-    "jobs-deduped"
-  ]
+  for_each = toset(local.region_locations)
+
+  name                = local.servicebus_namespace_names[each.key]
+  location            = each.key
+  resource_group_name = local.resource_group_names[each.key]
+
+  sku      = var.servicebus_sku
+  capacity = var.sb_capacity
+
+  enable_private_endpoints = var.enable_private_endpoints
+  ip_allowlist             = var.ip_allowlist
+
+  enable_diagnostics = var.enable_diagnostics
+  la_workspace_id    = module.log_analytics[each.key].id
+
+  duplicate_detection_enabled = true
+
   tags = local.tags
 }
 
-# Cosmos DB (Core SQL API)
+#############################################
+# Cosmos DB (primary in first region;        #
+# replicas in remaining regions)             #
+#############################################
+
 module "cosmos" {
-  source                        = "../../modules/cosmos"
-  name                          = "cos-${var.prefix}-${var.env}"
-  location                      = var.location
-  rg_name                       = module.rg.name
-  cosmos_serverless             = var.cosmos_serverless
-  enable_free_tier              = var.cosmos_enable_free_tier
-  public_network_access_enabled = true
-  enable_diagnostics            = var.enable_diagnostics
-  la_workspace_id               = module.monitor.log_analytics_workspace_id
-  enable_private_endpoints      = var.enable_private_endpoints
-  pe_subnet_id                  = module.network.subnet_ids["pe"]
-  tags                          = local.tags
+  source = "../../modules/cosmos"
+
+  name                = local.cosmos_account_name
+  location            = local.primary_region
+  resource_group_name = local.resource_group_names[local.primary_region]
+
+  enable_multi_region       = true
+  read_regions              = [for loc in local.region_locations : loc if loc != local.primary_region]
+  enable_automatic_failover = true
+
+  consistency_level = var.cosmos_consistency_level
+  serverless        = var.cosmos_serverless
+  free_tier         = var.cosmos_enable_free_tier
+
+  enable_private_endpoints = var.enable_private_endpoints
+  enable_diagnostics       = var.enable_diagnostics
+  la_workspace_id          = module.log_analytics[local.primary_region].id
+
+  tags = local.tags
 }
 
-# SQL (POC: SQL login; later switch to AAD-only and Private Link)
-module "sql" {
-  source                       = "../../modules/sql"
-  server_name                  = "sql-${var.prefix}-${var.env}"
-  db_name                      = "sqldb_${var.prefix}_${var.env}"
-  location                     = var.location
-  rg_name                      = module.rg.name
-  administrator_login          = var.sql_admin_login
-  administrator_login_password = var.sql_admin_password
+#############################################
+# Useful Outputs                             #
+#############################################
 
-  public_network_access_enabled = true
-  db_sku_name                   = var.env == "dev" ? "S0" : (var.env == "test" ? "S1" : "S2")
-  enable_diagnostics            = var.enable_diagnostics
-  la_workspace_id               = module.monitor.log_analytics_workspace_id
-  enable_private_endpoints      = var.enable_private_endpoints
-  pe_subnet_id                  = module.network.subnet_ids["pe"]
-  tags                          = local.tags
+output "resource_group_names" {
+  description = "Per-region resource group names."
+  value       = local.resource_group_names
+}
+
+output "log_analytics_workspace_ids" {
+  description = "Per-region Log Analytics workspace IDs."
+  value       = { for r, m in module.log_analytics : r => m.id }
+}
+
+output "servicebus_namespace_names" {
+  description = "Per-region Service Bus namespace names."
+  value       = local.servicebus_namespace_names
+}
+
+output "cosmos_account_name" {
+  description = "Cosmos DB account name (global)."
+  value       = module.cosmos.name
 }

@@ -1,36 +1,39 @@
 # modules/servicebus/main.tf
+# Updated to align with env main.tf inputs:
+# - resource_group_name
+# - sku, capacity
+# - ip_allowlist
+# - enable_private_endpoints
+# - enable_diagnostics, la_workspace_id
+# - duplicate_detection_enabled (applies to queues)
 
-# Namespace (v4-style inline network rules)
+# Namespace
 resource "azurerm_servicebus_namespace" "ns" {
-  name                          = var.name
-  location                      = var.location
-  resource_group_name           = var.rg_name
-  sku                           = var.sb_tier
-  capacity                      = var.sb_tier == "Premium" ? var.capacity : null
-  public_network_access_enabled = var.public_network_access_enabled
-  minimum_tls_version           = "1.2"
-  tags                          = var.tags
+  name                = var.name
+  location            = var.location
+  resource_group_name = var.resource_group_name
 
+  sku      = var.sku
+  capacity = var.sku == "Premium" ? var.capacity : null
+
+  # Keep PNA enabled unless you explicitly disable it in variables (optional var with default = true)
+  public_network_access_enabled = try(var.public_network_access_enabled, true)
+  minimum_tls_version           = "1.2"
+
+  tags = var.tags
+
+  # Network ACLs (v4)
   network_rule_set {
     # If any rules are present, default must be Deny
-    default_action           = (length(var.ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
-    ip_rules                 = var.ip_rules
+    default_action           = length(var.ip_allowlist) > 0 ? "Deny" : "Allow"
+    ip_rules                 = var.ip_allowlist
     trusted_services_allowed = try(var.trusted_services_enabled, false)
-
-    dynamic "network_rules" {
-      for_each = try(var.subnet_ids, [])
-      content {
-        subnet_id                            = network_rules.value
-        ignore_missing_vnet_service_endpoint = false
-      }
-    }
   }
 
-  # put lifecycle at the RESOURCE root (not inside network_rule_set)
   lifecycle {
     precondition {
-      condition     = var.sb_tier != "Premium" || var.capacity >= 1
-      error_message = "When sb_tier is Premium, capacity must be >= 1."
+      condition     = var.sku != "Premium" || var.capacity >= 1
+      error_message = "When sku is Premium, capacity must be >= 1."
     }
   }
 }
@@ -40,6 +43,10 @@ resource "azurerm_servicebus_queue" "q" {
   for_each     = toset(var.queues)
   name         = each.value
   namespace_id = azurerm_servicebus_namespace.ns.id
+
+  # Apply duplicate detection if requested (queue-level feature)
+  requires_duplicate_detection         = try(var.duplicate_detection_enabled, false)
+  duplicate_detection_history_time_window = try(var.duplicate_detection_time_window, null)
 }
 
 # Topics (optional)
@@ -78,7 +85,7 @@ resource "azurerm_private_endpoint" "pe" {
   count               = var.enable_private_endpoints ? 1 : 0
   name                = "${var.name}-pe"
   location            = var.location
-  resource_group_name = var.rg_name
+  resource_group_name = var.resource_group_name
   subnet_id           = var.pe_subnet_id
 
   private_service_connection {
@@ -89,7 +96,7 @@ resource "azurerm_private_endpoint" "pe" {
   }
 
   dynamic "private_dns_zone_group" {
-    for_each = length(var.private_dns_zone_ids) > 0 ? [1] : []
+    for_each = length(try(var.private_dns_zone_ids, [])) > 0 ? [1] : []
     content {
       name                 = "sb-dns"
       private_dns_zone_ids = var.private_dns_zone_ids
