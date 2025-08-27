@@ -168,7 +168,7 @@ stages:
   displayName: DEV (plan/apply)
   dependsOn: bootstrap
   variables:
-  - group: $(DEV_GROUP)
+  - group: LumoraGrid.Dev
   jobs:
   - job: tf_dev
     displayName: Terraform DEV
@@ -297,7 +297,7 @@ stages:
   dependsOn: dev
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: $(TEST_GROUP)
+  - group: LumoraGrid.Test
   jobs:
   - deployment: tf_test
     displayName: Terraform TEST
@@ -394,7 +394,7 @@ stages:
   dependsOn: test
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: $(UAT_GROUP)
+  - group: LumoraGrid.Uat
   jobs:
   - deployment: tf_uat
     displayName: Terraform UAT
@@ -491,7 +491,7 @@ stages:
   dependsOn: uat
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: $(PROD_GROUP)
+  - group: LumoraGrid.Prod
   jobs:
   - deployment: tf_prod
     displayName: Terraform PROD
