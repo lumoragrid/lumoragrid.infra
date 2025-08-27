@@ -120,3 +120,10 @@ variable "private_dns_zone_ids" {
   default     = []
   description = "Private DNS zone IDs to link with the private endpoint."
 }
+
+# Optional subnet rules (for VNet filtering)
+variable "subnet_ids" {
+  type        = list(string)
+  default     = []
+  description = "Optional list of subnet IDs to allow via network rules."
+}
