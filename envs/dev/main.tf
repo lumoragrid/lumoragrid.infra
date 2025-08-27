@@ -31,9 +31,7 @@ locals {
   region_locations = [for _, v in var.regions : v.location]        # list of location strings (order preserved)
 
   # ---- Region filtering (single-region runs) ----
-  selected_region_locations = var.target_region != "" ?
-    [for loc in local.region_locations : loc if loc == var.target_region] :
-    local.region_locations
+  selected_region_locations = var.target_region != "" ? [for loc in local.region_locations : loc if loc == var.target_region] : local.region_locations
 
   # By-location lookup (filtered to selection)
   regions_by_location = {
