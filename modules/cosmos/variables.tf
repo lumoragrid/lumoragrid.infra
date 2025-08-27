@@ -3,7 +3,7 @@
 
 variable "name" {
   type        = string
-  description = "Cosmos DB account name (globally unique)."
+  description = "Cosmos DB account name (3-44 lowercase, globally unique)."
 }
 
 variable "location" {
@@ -11,9 +11,9 @@ variable "location" {
   description = "Primary Azure region for the Cosmos DB account."
 }
 
-variable "resource_group_name" {
+variable "rg_name" {
   type        = string
-  description = "Resource group where the Cosmos DB account will be created."
+  description = "Resource group name where the Cosmos DB account resides."
 }
 
 variable "tags" {
@@ -22,57 +22,38 @@ variable "tags" {
   description = "Common resource tags."
 }
 
-# Account consistency
-variable "consistency_level" {
-  type        = string
-  default     = "Session"
-  description = "Cosmos DB consistency level (Strong | BoundedStaleness | Session | ConsistentPrefix | Eventual)."
-}
-
-# Account modes
-variable "serverless" {
-  type        = bool
-  default     = false
-  description = "Deploy Cosmos DB in serverless mode (vs provisioned/Autoscale)."
-}
-
-variable "free_tier" {
-  type        = bool
-  default     = false
-  description = "Enable Cosmos Free Tier (first 1000 RU/s and 25 GB free, where eligible)."
-}
-
-# Multi-region & failover
-variable "enable_multi_region" {
-  type        = bool
-  default     = false
-  description = "Enable multi-region read replicas."
-}
-
-variable "read_regions" {
-  type        = list(string)
-  default     = []
-  description = "List of regions (Azure location strings) for read replicas."
-}
-
-variable "enable_automatic_failover" {
+# Mode / cost controls
+variable "cosmos_serverless" {
   type        = bool
   default     = true
-  description = "Enable automatic failover between regions."
+  description = "Enable Serverless capability (EnableServerless)."
 }
 
-# Network access
+variable "enable_free_tier" {
+  type        = bool
+  default     = true
+  description = "Enable Free Tier (where eligible)."
+}
+
+# Availability / failover
+variable "automatic_failover_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable automatic failover for multi-region accounts."
+}
+
+# Networking
 variable "public_network_access_enabled" {
   type        = bool
   default     = true
-  description = "Allow public network access to the Cosmos account."
+  description = "Allow public network access (disable when using Private Endpoints only)."
 }
 
 # Diagnostics
 variable "enable_diagnostics" {
   type        = bool
   default     = true
-  description = "Enable Azure Monitor diagnostic settings."
+  description = "Create diagnostic setting to Log Analytics."
 }
 
 variable "la_workspace_id" {
@@ -81,21 +62,21 @@ variable "la_workspace_id" {
   description = "Log Analytics workspace resource ID (required if enable_diagnostics = true)."
 }
 
-# Private endpoints
+# Private Endpoints
 variable "enable_private_endpoints" {
   type        = bool
   default     = false
-  description = "Create a private endpoint for the Cosmos DB account."
+  description = "Create a Private Endpoint for the Cosmos SQL API."
 }
 
 variable "pe_subnet_id" {
   type        = string
   default     = null
-  description = "Subnet ID for the private endpoint (required if enable_private_endpoints = true)."
+  description = "Subnet ID for the Private Endpoint (required when enable_private_endpoints = true)."
 }
 
 variable "private_dns_zone_ids" {
   type        = list(string)
   default     = []
-  description = "Private DNS zone IDs to link with the private endpoint."
+  description = "Private DNS zone IDs to link when creating a Private Endpoint."
 }
