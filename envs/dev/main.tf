@@ -30,11 +30,20 @@ locals {
   regions_map      = var.regions                                   # map-of-objects
   region_locations = [for _, v in var.regions : v.location]        # list of location strings (order preserved)
 
-  # By-location lookup (location => region object)
-  regions_by_location = { for _, v in var.regions : v.location => v }
+  # ---- Region filtering (single-region runs) ----
+  selected_region_locations = var.target_region != "" ?
+    [for loc in local.region_locations : loc if loc == var.target_region] :
+    local.region_locations
 
-  # Primary region = first provided location (deterministic)
-  primary_region = length(local.region_locations) > 0 ? local.region_locations[0] : "australiaeast"
+  # By-location lookup (filtered to selection)
+  regions_by_location = {
+    for _, v in var.regions :
+    v.location => v
+    if var.target_region == "" || v.location == var.target_region
+  }
+
+  # Primary region = first selected location (deterministic)
+  primary_region = length(local.selected_region_locations) > 0 ? local.selected_region_locations[0] : "australiaeast"
 
   # Short codes for Azure regions used in resource names.
   region_short = {
@@ -78,38 +87,38 @@ locals {
   )
 
   #############################################
-  # Per-region deterministic names             #
+  # Per-region deterministic names (filtered) #
   #############################################
 
   resource_group_names = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => "${local.prefix}-rg-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
   }
 
   monitor_name_prefixes = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => "${local.prefix}-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
   }
 
   servicebus_namespace_names = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => "${local.prefix}-sb-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
   }
 
   vnet_names = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => "${local.prefix}-vnet-${lookup(local.region_short, loc, substr(loc, 0, 3))}"
   }
 
   # Storage account name: 3–24 lower alnum
   storage_account_names = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => substr(lower(replace("${local.project}${local.environment}${lookup(local.region_short, loc, substr(loc, 0, 3))}st", "-", "")), 0, 24)
   }
 
   # Key Vault name: 3–24 lower alnum
   key_vault_names = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => substr(lower(replace("${local.project}${local.environment}${lookup(local.region_short, loc, substr(loc, 0, 3))}kv", "-", "")), 0, 24)
   }
 
@@ -128,7 +137,7 @@ locals {
 module "resource_groups" {
   source = "../../modules/resource-group"
 
-  for_each = toset(local.region_locations)
+  for_each = toset(local.selected_region_locations)
 
   name     = local.resource_group_names[each.key]
   location = each.key
@@ -142,11 +151,11 @@ module "resource_groups" {
 module "network" {
   source = "../../modules/network"
 
-  for_each = toset(local.region_locations)
+  for_each = toset(local.selected_region_locations)
 
-  name                = local.vnet_names[each.key]
-  location            = each.key
-  resource_group_name = module.resource_groups[each.key].name
+  name     = local.vnet_names[each.key]
+  location = each.key
+  rg_name  = module.resource_groups[each.key].name
 
   # module expects list(string) for address_space and map(string) for subnets
   address_space = [local.regions_by_location[each.key].address_space]
@@ -162,7 +171,7 @@ module "network" {
 module "monitor" {
   source = "../../modules/monitor"
 
-  for_each = toset(local.region_locations)
+  for_each = toset(local.selected_region_locations)
 
   name_prefix         = local.monitor_name_prefixes[each.key]
   location            = each.key
@@ -182,14 +191,14 @@ module "storage" {
   source = "../../modules/storage"
 
   for_each = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => loc
     if try(local.regions_by_location[loc].enable_storage, true)
   }
 
   account_name        = local.storage_account_names[each.key]
   location            = each.key
-  resource_group_name = module.resource_groups[each.key].name
+  rg_name             = module.resource_groups[each.key].name
 
   account_kind        = var.storage.account_kind
   replication_type    = var.storage.replication_type
@@ -205,7 +214,6 @@ module "storage" {
   tags = local.tags
 }
 
-
 #############################################
 # Per-Region Service Bus Namespaces         #
 #############################################
@@ -213,24 +221,23 @@ module "storage" {
 module "servicebus" {
   source  = "../../modules/servicebus"
 
-  # Only where region toggle enable_servicebus is true (default true)
   for_each = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => loc
     if try(local.regions_by_location[loc].enable_servicebus, true)
   }
 
   name     = local.servicebus_namespace_names[each.key]
   location = each.key
-  resource_group_name  = module.resource_groups[each.key].name
+  rg_name  = module.resource_groups[each.key].name
 
   # Sizing & SKU
-  sb_tier  = var.servicebus_sku            # "Premium" | "Standard"
-  capacity = var.sb_capacity               # Premium MU (1/2/4); 0 for Standard
+  sb_tier  = var.servicebus_sku
+  capacity = var.sb_capacity
 
   # Network & security
   public_network_access_enabled = var.enable_private_endpoints ? false : true
-  ip_allowlist                      = var.ip_allowlist
+  ip_allowlist                  = var.ip_allowlist
   trusted_services_enabled      = true
 
   # Diagnostics
@@ -252,18 +259,17 @@ module "servicebus" {
 module "keyvault" {
   source = "../../modules/keyvault"
 
-  # Only where region toggle enable_keyvault is true (default true)
   for_each = {
-    for loc in local.region_locations :
+    for loc in local.selected_region_locations :
     loc => loc
     if try(local.regions_by_location[loc].enable_keyvault, true)
   }
 
-  name                 = local.key_vault_names[each.key]
-  location             = each.key
-  resource_group_name  = module.resource_groups[each.key].name
-  tenant_id            = var.tenant_id
-  tags                 = local.tags
+  name                = local.key_vault_names[each.key]
+  location            = each.key
+  rg_name             = module.resource_groups[each.key].name
+  tenant_id           = var.tenant_id
+  tags                = local.tags
 
   public_network_access_enabled = var.enable_private_endpoints ? false : true
   enable_purge_protection       = true
@@ -283,17 +289,22 @@ module "keyvault" {
 module "cosmos" {
   source = "../../modules/cosmos"
 
-  # Account & placement
-  name    = local.cosmos_account_name
+  # Account & placement (primary only here)
+  name     = local.cosmos_account_name
   location = local.primary_region
-  resource_group_name  = module.resource_groups[local.primary_region].name
+  rg_name  = module.resource_groups[local.primary_region].name
 
   # Account mode/cost controls
   cosmos_serverless = var.cosmos_serverless
   enable_free_tier  = var.cosmos_enable_free_tier
 
-  # Failover & networking
+  # (Optional) Multi-region:
+  # enable_multi_region       = true
+  # read_regions              = [for loc in local.selected_region_locations : loc if loc != local.primary_region]
+  # consistency_level         = var.cosmos_consistency_level
   automatic_failover_enabled    = true
+
+  # Networking
   public_network_access_enabled = var.enable_private_endpoints ? false : true
   enable_private_endpoints      = var.enable_private_endpoints
   pe_subnet_id                  = module.network[local.primary_region].subnet_ids["pe"]
@@ -313,10 +324,10 @@ module "cosmos" {
 module "sql" {
   source = "../../modules/sql"
 
-  server_name         = lower(replace(local.sql_server_name, "_", "-"))
-  db_name             = local.sql_db_name
-  location            = local.primary_region
-  resource_group_name = module.resource_groups[local.primary_region].name
+  server_name = lower(replace(local.sql_server_name, "_", "-"))
+  db_name     = local.sql_db_name
+  location    = local.primary_region
+  rg_name     = module.resource_groups[local.primary_region].name
 
   administrator_login          = var.sql_admin_login
   administrator_login_password = var.sql_admin_password
@@ -346,8 +357,6 @@ module "sql" {
 module "identity" {
   source = "../../modules/identity"
 
-  # Provide role assignments via a variable later if desired.
-  # Keeping empty list by default to include module safely.
   role_assignments = []
 }
 

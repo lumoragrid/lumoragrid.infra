@@ -158,3 +158,8 @@ variable "storage" {
   }
 }
 
+variable "target_region" {
+  type        = string
+  default     = ""
+  description = "If non-empty, deploy only this Azure location (e.g., australiasoutheast)."
+}

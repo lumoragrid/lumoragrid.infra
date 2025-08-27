@@ -1,7 +1,8 @@
 # LumoraGrid Terraform – Azure DevOps (bootstrap + dev→test→uat→prod)
-# Updated to support selective region deploys via `target_region` parameter.
-# If `target_region` is empty => deploy all regions from TF_REGIONS_JSON.
-# If `target_region` is set (e.g., australiasoutheast) => deploy ONLY that region.
+# Supports selective region deploys via `target_region` parameter.
+# If `target_region` == "all" or blank => deploy ALL regions from TF_REGIONS_JSON.
+# Otherwise deploy ONLY that region. We ALWAYS pass the full regions JSON and
+# also pass target_region to let Terraform filter internally.
 
 trigger:
   branches:
@@ -28,78 +29,68 @@ pr:
 # Variables from Variable Groups
 # ------------------------------
 variables:
-# Shared (backend, tenant, tags, law_sku, etc.)
-- group: LumoraGrid.Common
+  # Shared (backend, tenant, tags, law_sku, etc.)
+  - group: LumoraGrid.Common
 
-# Per-environment groups (choose at compile time for each stage)
-- name: DEV_GROUP
-  value: LumoraGrid.Dev
-- name: TEST_GROUP
-  value: LumoraGrid.Test
-- name: UAT_GROUP
-  value: LumoraGrid.Uat
-- name: PROD_GROUP
-  value: LumoraGrid.Prod
-
-# Tooling
-- name: TF_VERSION
-  value: '1.7.5'
+  # Tooling
+  - name: TF_VERSION
+    value: '1.7.5'
 
 # ------------------------------
-# Parameters
+# Parameters (shown at Run Pipeline)
 # ------------------------------
 parameters:
 - name: target_region
-  displayName: "Target Region (optional, e.g., australiasoutheast)"
+  displayName: "Target Region (leave 'all' for every region)"
   type: string
-  default: australiasoutheast
+  default: all
   values:
-  - all
-  - eastus
-  - eastus2
-  - southcentralus
-  - westus2
-  - westus3
-  - australiaeast
-  - australiasoutheast
-  - australiacentral
-  - australiacentral2
-  - eastasia
-  - southeastasia
-  - northeurope
-  - westeurope
-  - swedencentral
-  - uksouth
-  - ukwest
-  - centralus
-  - westus
-  - southafricanorth
-  - southafricawest
-  - centralindia
-  - southindia
-  - westindia
-  - japaneast
-  - japanwest
-  - koreacentral
-  - koreasouth
-  - canadacentral
-  - canadaeast
-  - francecentral
-  - francesouth
-  - germanywestcentral
-  - germanynorth
-  - italynorth
-  - norwayeast
-  - norwaywest
-  - polandcentral
-  - switzerlandnorth
-  - switzerlandwest
-  - uaenorth
-  - uaecentral
-  - brazilsouth
-  - brazilsoutheast
-  - israelcentral
-  - qatarcentral
+    - all
+    - eastus
+    - eastus2
+    - southcentralus
+    - westus2
+    - westus3
+    - australiaeast
+    - australiasoutheast
+    - australiacentral
+    - australiacentral2
+    - eastasia
+    - southeastasia
+    - northeurope
+    - westeurope
+    - swedencentral
+    - uksouth
+    - ukwest
+    - centralus
+    - westus
+    - southafricanorth
+    - southafricawest
+    - centralindia
+    - southindia
+    - westindia
+    - japaneast
+    - japanwest
+    - koreacentral
+    - koreasouth
+    - canadacentral
+    - canadaeast
+    - francecentral
+    - francesouth
+    - germanywestcentral
+    - germanynorth
+    - italynorth
+    - norwayeast
+    - norwaywest
+    - polandcentral
+    - switzerlandnorth
+    - switzerlandwest
+    - uaenorth
+    - uaecentral
+    - brazilsouth
+    - brazilsoutheast
+    - israelcentral
+    - qatarcentral
 
 stages:
 # ---------- BOOTSTRAP (idempotent): state + provider registration ----------
@@ -168,7 +159,7 @@ stages:
   displayName: DEV (plan/apply)
   dependsOn: bootstrap
   variables:
-  - group: LumoraGrid.Dev
+    - group: LumoraGrid.Dev
   jobs:
   - job: tf_dev
     displayName: Terraform DEV
@@ -208,48 +199,31 @@ stages:
 
           terraform validate
 
-          if [ -n "${{ parameters.target_region }}" != "all" ]; then
-            echo "Restricting to region: ${{ parameters.target_region }}"
-            terraform plan -out=tfplan \
-              -var "project=$(TF_PROJECT)" \
-              -var "environment=$(TF_ENVIRONMENT)" \
-              -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-              -var "tenant_id=$(TF_TENANT_ID)" \
-              -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
-              -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-              -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-              -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-              -var "sb_capacity=$(TF_SB_CAPACITY)" \
-              -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-              -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-              -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-              -var "law_sku=$(TF_LAW_SKU)" \
-              -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-              -var 'tags=$(TF_TAGS_JSON)' \
-              -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-              -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-              -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-          else
-            terraform plan -out=tfplan \
-              -var "project=$(TF_PROJECT)" \
-              -var "environment=$(TF_ENVIRONMENT)" \
-              -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-              -var "tenant_id=$(TF_TENANT_ID)" \
-              -var 'regions=$(TF_REGIONS_JSON)' \
-              -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-              -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-              -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-              -var "sb_capacity=$(TF_SB_CAPACITY)" \
-              -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-              -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-              -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-              -var "law_sku=$(TF_LAW_SKU)" \
-              -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-              -var 'tags=$(TF_TAGS_JSON)' \
-              -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-              -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-              -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-          fi
+          # Always pass full regions + the selected target_region ('' when 'all')
+          TARGET_VAR="${{ parameters.target_region }}"
+          [ "$TARGET_VAR" = "all" ] && TARGET_VAR=""
+          echo "target_region='$TARGET_VAR'"
+
+          terraform plan -out=tfplan \
+            -var "project=$(TF_PROJECT)" \
+            -var "environment=$(TF_ENVIRONMENT)" \
+            -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+            -var "tenant_id=$(TF_TENANT_ID)" \
+            -var "target_region=$TARGET_VAR" \
+            -var 'regions=$(TF_REGIONS_JSON)' \
+            -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+            -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+            -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+            -var "sb_capacity=$(TF_SB_CAPACITY)" \
+            -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+            -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+            -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+            -var "law_sku=$(TF_LAW_SKU)" \
+            -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+            -var 'tags=$(TF_TAGS_JSON)' \
+            -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+            -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+            -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
 
           terraform show -no-color tfplan > plan.txt
       env:
@@ -297,7 +271,7 @@ stages:
   dependsOn: dev
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: LumoraGrid.Test
+    - group: LumoraGrid.Test
   jobs:
   - deployment: tf_test
     displayName: Terraform TEST
@@ -340,48 +314,30 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" != "all" ]; then
-                  echo "Restricting to region: ${{ parameters.target_region }}"
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                else
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var 'regions=$(TF_REGIONS_JSON)' \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                fi
+                TARGET_VAR="${{ parameters.target_region }}"
+                [ "$TARGET_VAR" = "all" ] && TARGET_VAR=""
+                echo "target_region='$TARGET_VAR'"
+
+                terraform plan -out=tfplan \
+                  -var "project=$(TF_PROJECT)" \
+                  -var "environment=$(TF_ENVIRONMENT)" \
+                  -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                  -var "tenant_id=$(TF_TENANT_ID)" \
+                  -var "target_region=$TARGET_VAR" \
+                  -var 'regions=$(TF_REGIONS_JSON)' \
+                  -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                  -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                  -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                  -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                  -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                  -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                  -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                  -var "law_sku=$(TF_LAW_SKU)" \
+                  -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                  -var 'tags=$(TF_TAGS_JSON)' \
+                  -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                  -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                  -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
 
                 terraform apply -auto-approve tfplan
             env:
@@ -394,7 +350,7 @@ stages:
   dependsOn: test
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: LumoraGrid.Uat
+    - group: LumoraGrid.Uat
   jobs:
   - deployment: tf_uat
     displayName: Terraform UAT
@@ -437,48 +393,30 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" != "all" ]; then
-                  echo "Restricting to region: ${{ parameters.target_region }}"
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                else
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var 'regions=$(TF_REGIONS_JSON)' \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                fi
+                TARGET_VAR="${{ parameters.target_region }}"
+                [ "$TARGET_VAR" = "all" ] && TARGET_VAR=""
+                echo "target_region='$TARGET_VAR'"
+
+                terraform plan -out=tfplan \
+                  -var "project=$(TF_PROJECT)" \
+                  -var "environment=$(TF_ENVIRONMENT)" \
+                  -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                  -var "tenant_id=$(TF_TENANT_ID)" \
+                  -var "target_region=$TARGET_VAR" \
+                  -var 'regions=$(TF_REGIONS_JSON)' \
+                  -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                  -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                  -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                  -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                  -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                  -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                  -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                  -var "law_sku=$(TF_LAW_SKU)" \
+                  -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                  -var 'tags=$(TF_TAGS_JSON)' \
+                  -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                  -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                  -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
 
                 terraform apply -auto-approve tfplan
             env:
@@ -491,7 +429,7 @@ stages:
   dependsOn: uat
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   variables:
-  - group: LumoraGrid.Prod
+    - group: LumoraGrid.Prod
   jobs:
   - deployment: tf_prod
     displayName: Terraform PROD
@@ -534,48 +472,30 @@ stages:
 
                 terraform validate
 
-                if [ -n "${{ parameters.target_region }}" != "all" ]; then
-                  echo "Restricting to region: ${{ parameters.target_region }}"
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var "regions={${{ parameters.target_region }} = jsondecode('$(TF_REGIONS_JSON)')[\"${{ parameters.target_region }}\"]}" \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                else
-                  terraform plan -out=tfplan \
-                    -var "project=$(TF_PROJECT)" \
-                    -var "environment=$(TF_ENVIRONMENT)" \
-                    -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
-                    -var "tenant_id=$(TF_TENANT_ID)" \
-                    -var 'regions=$(TF_REGIONS_JSON)' \
-                    -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
-                    -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
-                    -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
-                    -var "sb_capacity=$(TF_SB_CAPACITY)" \
-                    -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
-                    -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
-                    -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
-                    -var "law_sku=$(TF_LAW_SKU)" \
-                    -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
-                    -var 'tags=$(TF_TAGS_JSON)' \
-                    -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
-                    -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
-                    -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
-                fi
+                TARGET_VAR="${{ parameters.target_region }}"
+                [ "$TARGET_VAR" = "all" ] && TARGET_VAR=""
+                echo "target_region='$TARGET_VAR'"
+
+                terraform plan -out=tfplan \
+                  -var "project=$(TF_PROJECT)" \
+                  -var "environment=$(TF_ENVIRONMENT)" \
+                  -var "subscription_id=$(TF_SUBSCRIPTION_ID)" \
+                  -var "tenant_id=$(TF_TENANT_ID)" \
+                  -var "target_region=$TARGET_VAR" \
+                  -var 'regions=$(TF_REGIONS_JSON)' \
+                  -var "enable_diagnostics=$(TF_ENABLE_DIAGNOSTICS)" \
+                  -var "enable_private_endpoints=$(TF_ENABLE_PE)" \
+                  -var "servicebus_sku=$(TF_SERVICEBUS_SKU)" \
+                  -var "sb_capacity=$(TF_SB_CAPACITY)" \
+                  -var "cosmos_consistency_level=$(TF_COSMOS_CONSISTENCY)" \
+                  -var "cosmos_serverless=$(TF_COSMOS_SERVERLESS)" \
+                  -var "cosmos_enable_free_tier=$(TF_COSMOS_FREE_TIER)" \
+                  -var "law_sku=$(TF_LAW_SKU)" \
+                  -var "log_analytics_retention_days=$(TF_LOG_RETENTION_DAYS)" \
+                  -var 'tags=$(TF_TAGS_JSON)' \
+                  -var 'ip_allowlist=$(TF_IP_ALLOWLIST)' \
+                  -var "sql_admin_login=$(TF_SQL_ADMIN_LOGIN)" \
+                  -var "sql_admin_password=$(TF_SQL_ADMIN_PASSWORD)"
 
                 terraform apply -auto-approve tfplan
             env:
