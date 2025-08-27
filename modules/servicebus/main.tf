@@ -13,7 +13,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  sku      = var.sku
+  sb_tier      = var.sku
   capacity = var.sku == "Premium" ? var.capacity : null
 
   # Keep PNA enabled unless you explicitly disable it in variables (optional var with default = true)
@@ -26,7 +26,7 @@ resource "azurerm_servicebus_namespace" "ns" {
   network_rule_set {
     # If any rules are present, default must be Deny
     default_action           = length(var.ip_allowlist) > 0 ? "Deny" : "Allow"
-    ip_rules                 = var.ip_allowlist
+    ip_allowlist                 = var.ip_allowlist
     trusted_services_allowed = try(var.trusted_services_enabled, false)
   }
 

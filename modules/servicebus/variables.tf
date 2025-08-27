@@ -23,7 +23,7 @@ variable "tags" {
 }
 
 # SKU / Capacity
-variable "sku" {
+variable "sb_tier" {
   type        = string
   default     = "Standard" # Allowed: Basic, Standard, Premium
   description = "Service Bus SKU."
