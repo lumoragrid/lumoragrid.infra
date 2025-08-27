@@ -265,7 +265,7 @@ module "keyvault" {
 
   name                = local.key_vault_names[each.key]
   location            = each.key
-  rg_name             = module.resource_groups[each.key].name
+  resource_group_name = module.resource_groups[each.key].name
   tenant_id           = var.tenant_id
   tags                = local.tags
 
