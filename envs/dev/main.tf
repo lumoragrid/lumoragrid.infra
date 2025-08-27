@@ -181,25 +181,22 @@ module "monitor" {
 module "storage" {
   source = "../../modules/storage"
 
-  # Only where region toggle enable_storage is true (default true)
   for_each = {
     for loc in local.region_locations :
     loc => loc
     if try(local.regions_by_location[loc].enable_storage, true)
   }
 
-  name                = local.storage_account_names[each.key]
+  account_name        = local.storage_account_names[each.key]
   location            = each.key
-  resource_group_name = local.resource_group_names[each.key]
+  rg_name             = local.resource_group_names[each.key]
 
-  account_kind     = var.storage.account_kind
-  replication_type = var.storage.replication_type
+  account_kind        = var.storage.account_kind
+  replication_type    = var.storage.replication_type
 
-  # Diagnostics
-  enable_diagnostics = var.enable_diagnostics
-  la_workspace_id    = module.monitor[each.key].log_analytics_workspace_id
+  enable_diagnostics  = var.enable_diagnostics
+  la_workspace_id     = module.monitor[each.key].log_analytics_workspace_id
 
-  # Private Endpoints
   enable_private_endpoints      = var.enable_private_endpoints
   pe_subnet_id                  = module.network[each.key].subnet_ids["pe"]
   public_network_access_enabled = var.enable_private_endpoints ? false : true
@@ -207,6 +204,7 @@ module "storage" {
 
   tags = local.tags
 }
+
 
 #############################################
 # Per-Region Service Bus Namespaces         #
