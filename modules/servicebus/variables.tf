@@ -28,7 +28,7 @@ variable "sb_tier" {
   default     = "Standard" # Allowed: Basic, Standard, Premium
   description = "Service Bus SKU."
   validation {
-    condition     = contains(["Basic", "Standard", "Premium"], var.sku)
+    condition     = contains(["Basic", "Standard", "Premium"], var.sb_tier)
     error_message = "sku must be one of: Basic, Standard, Premium."
   }
 }
