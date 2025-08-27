@@ -146,7 +146,7 @@ module "network" {
 
   name                = local.vnet_names[each.key]
   location            = each.key
-  resource_group_name = local.resource_group_names[each.key]
+  resource_group_name = module.resource_groups[each.key].name
 
   # module expects list(string) for address_space and map(string) for subnets
   address_space = [local.regions_by_location[each.key].address_space]
@@ -166,7 +166,7 @@ module "monitor" {
 
   name_prefix         = local.monitor_name_prefixes[each.key]
   location            = each.key
-  resource_group_name = local.resource_group_names[each.key]  # <-- CHANGED from rg_name
+  resource_group_name = module.resource_groups[each.key].name
 
   law_sku        = var.law_sku
   retention_days = var.log_analytics_retention_days
@@ -189,7 +189,7 @@ module "storage" {
 
   account_name        = local.storage_account_names[each.key]
   location            = each.key
-  resource_group_name = local.resource_group_names[each.key]
+  resource_group_name = module.resource_groups[each.key].name
 
   account_kind        = var.storage.account_kind
   replication_type    = var.storage.replication_type
@@ -222,7 +222,7 @@ module "servicebus" {
 
   name     = local.servicebus_namespace_names[each.key]
   location = each.key
-  resource_group_name  = local.resource_group_names[each.key]
+  resource_group_name  = module.resource_groups[each.key].name
 
   # Sizing & SKU
   sb_tier  = var.servicebus_sku            # "Premium" | "Standard"
@@ -261,7 +261,7 @@ module "keyvault" {
 
   name                 = local.key_vault_names[each.key]
   location             = each.key
-  resource_group_name  = local.resource_group_names[each.key]  # <-- updated
+  resource_group_name  = module.resource_groups[each.key].name
   tenant_id            = var.tenant_id
   tags                 = local.tags
 
@@ -286,7 +286,7 @@ module "cosmos" {
   # Account & placement
   name    = local.cosmos_account_name
   location = local.primary_region
-  resource_group_name  = local.resource_group_names[local.primary_region]
+  resource_group_name  = module.resource_groups[local.primary_region].name
 
   # Account mode/cost controls
   cosmos_serverless = var.cosmos_serverless
@@ -316,7 +316,7 @@ module "sql" {
   server_name         = lower(replace(local.sql_server_name, "_", "-"))
   db_name             = local.sql_db_name
   location            = local.primary_region
-  resource_group_name = local.resource_group_names[local.primary_region]
+  resource_group_name = module.resource_groups[local.primary_region].name
 
   administrator_login          = var.sql_admin_login
   administrator_login_password = var.sql_admin_password
