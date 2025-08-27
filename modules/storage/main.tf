@@ -3,7 +3,7 @@
 
 resource "azurerm_storage_account" "sa" {
   name                            = var.account_name
-  resource_group_name             = var.rg_name
+  resource_group_name             = var.resource_group_name
   location                        = var.location
   account_kind                    = var.account_kind
   account_tier                    = "Standard"
